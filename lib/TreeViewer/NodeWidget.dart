@@ -52,7 +52,7 @@ class _NodeWidgetState extends State<NodeWidget> {
                             .first
                             .headerLeafKey ==
                         widget.leafkey
-                    ? Colors.red
+                    ? Colors.blueAccent
                     : Colors.transparent),
             child: Wrap(direction: Axis.vertical, children: [
               Text(

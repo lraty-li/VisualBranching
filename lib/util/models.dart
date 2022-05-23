@@ -27,7 +27,7 @@ class Repo {
 
 //标头节点key
 //todo 标头表示最接近真实目标文件状态的版本（节点）?
-  ValueKey<String?>? headerLeafKey;
+  ValueKey<String>? headerLeafKey;
   // 每棵树的根节点（不可见节点的直接子孩子节点）
   List<ValueKey<String>> rootLeafKeys;
   List<Leaf> leafs;
@@ -212,7 +212,7 @@ class Repo {
       leafList.add(
           Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
     });
-    String? headerLeafIdName = repoJsonObj["headerLeaf"];
+    String headerLeafIdName = repoJsonObj["headerLeaf"];
 
     List<String> rootsIdNames = List<String>.from(repoJsonObj["roots"]);
     List<ValueKey<String>> rootsKeys =
