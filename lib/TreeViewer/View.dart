@@ -88,7 +88,7 @@ class _TreeViewState extends State<TreeView> {
 
     }
 
-    //todo 去除consumer
+    //todo 去除consumer?
     return Consumer<MainStatus>(
       builder: (context, provider, child) => InteractiveViewer(
           constrained: false,

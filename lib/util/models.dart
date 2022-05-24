@@ -32,6 +32,9 @@ class Repo {
   List<ValueKey<String>> rootLeafKeys;
   List<Leaf> leafs;
 
+  //recycle bin
+  List<Leaf> leafRcyclBin;
+
   Map<ValueKey<String>, List<ValueKey<String>>> realtions;
 
   static String _genLeafName(int nowUnixEpoch, NodeType nodeType) {
@@ -67,18 +70,108 @@ class Repo {
     }
   }
 
-  _copyTo(String destination) {
-    //创建文件路径，复制文件
-    comparionTable.forEach((saveFileName, targetFileAbsPath) {
-      File tempFile = File(targetFileAbsPath);
-      tempFile.copySync(destination + Platform.pathSeparator + saveFileName);
-    });
-  }
+  _copyTo(String filePath, CopyDirection direction) {
+    //todo 异步
+    Directory checkDir = Directory(filePath);
+    if (!checkDir.existsSync()) {
+      checkDir.createSync();
+    }
 
-  static retirveTo(ValueKey leaf) {}
+    //todo 出错控制
+
+    //todo 文件目标已被删除,报错？
+    switch (direction) {
+      case CopyDirection.target2Leaf:
+        {
+          //创建文件路径，复制文件
+          comparionTable.forEach((saveFileName, targetFileAbsPath) {
+            File tempFile = File(targetFileAbsPath);
+            tempFile.copySync(filePath + Platform.pathSeparator + saveFileName);
+          });
+        }
+        break;
+      case CopyDirection.leaf2Target:
+        {
+          //todo 先将现有target存入缓冲区(回收站)
+
+          //覆盖目标文件
+          comparionTable.forEach((saveFileName, targetFileAbsPath) {
+            File tempFile =
+                File(filePath + Platform.pathSeparator + saveFileName);
+            tempFile.copySync(targetFileAbsPath);
+          });
+        }
+        break;
+    }
+  }
 
   static runAutoSave() {
     //todo impl
+  }
+
+  retirveToLeaf(ValueKey targetLeafKey) {
+    //不会出现不在leafs中的key
+    // final targetLeaf =
+    //     leafs.firstWhere((element) => element.leafKey == targetLeafKey);
+
+    //临时leaf,创建一个现有备份，直接送入回收站
+    //不能newLeaf方法,不移动标头不创建relation
+    final tempLeaf = Leaf(
+        ValueKey("${DateTime.now().millisecondsSinceEpoch}NA"),
+        false,
+        "发生覆盖时的备份");
+    leafRcyclBin.add(tempLeaf);
+
+    //复制文件直接到回收站
+    _copyTo(
+        "${repoPath}${Platform.pathSeparator}recycleBin${Platform.pathSeparator}${tempLeaf.leafKey.value}",
+        CopyDirection.target2Leaf);
+
+    //覆盖到目标文件处
+    _copyTo(repoPath + Platform.pathSeparator + targetLeafKey.value,
+        CopyDirection.leaf2Target);
+
+    //移动标头到回退到的leaf
+    headerLeafKey = targetLeafKey as ValueKey<String>?;
+
+    //写入json
+    toJsonFile();
+  }
+
+  delLeaf(ValueKey targetLeafKey) async {
+    //移动节点(逻辑删除,移动到回收站List)
+    Leaf targetLeaf =
+        leafs.firstWhere((element) => element.leafKey == targetLeafKey);
+    leafRcyclBin.add(targetLeaf);
+    leafs.remove(targetLeaf);
+
+    //todo 清除relation
+
+    //移动文件
+
+    String leafPath =
+        repoName + Platform.pathSeparator + targetLeaf.leafKey.value;
+
+    final leafDircetory = Directory(leafPath);
+    final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
+
+//todo 异步
+
+    if (Directory(recyclePath).existsSync()) {
+      try {
+        await leafDircetory.rename(
+            "$repoPath${Platform.pathSeparator}recycleBin${Platform.pathSeparator}${targetLeaf.leafKey.value}");
+      } on FileSystemException catch (e) {
+        //文件夹移动失败
+
+      }
+    } else {
+      //todo 垃圾桶不存在
+    }
+
+    //todo 垃圾桶清理
+
+    //外部刷新
   }
 
   Future<Leaf> newLeaf(NodeType nodeType, String leafAnnotation) async {
@@ -91,24 +184,12 @@ class Repo {
         Leaf(ValueKey(newLeafName), _genCanEdit(nodeType), leafAnnotation);
 
     //创建leaf 文件夹
-    Directory leafPath = Directory(Platform.resolvedExecutable.substring(
-            0,
-            (Platform.resolvedExecutable.length -
-                Platform.resolvedExecutable
-                    .split(Platform.pathSeparator)
-                    .last
-                    .length -
-                1)) +
-        Platform.pathSeparator +
-        "repos" +
-        Platform.pathSeparator +
-        repoIdName +
-        Platform.pathSeparator +
-        newLeaf.leafKey.value);
+    Directory leafPath = Directory(
+        "${Platform.resolvedExecutable.substring(0, (Platform.resolvedExecutable.length - Platform.resolvedExecutable.split(Platform.pathSeparator).last.length - 1))}${Platform.pathSeparator}repos${Platform.pathSeparator}$repoIdName${Platform.pathSeparator}${newLeaf.leafKey.value}");
     await leafPath.create();
 
     //复制文件
-    _copyTo(leafPath.path);
+    _copyTo(leafPath.path, CopyDirection.target2Leaf);
 
     leafs.add(newLeaf);
     if (headerLeafKey == null) {
@@ -131,8 +212,6 @@ class Repo {
     return newLeaf;
   }
 
-  loadLeaf() {}
-
   toJsonFile() {
     //todo 直接覆盖文件？
     Map repoMap = {
@@ -147,6 +226,7 @@ class Repo {
       "headerLeaf": headerLeafKey?.value,
       "roots": rootLeafKeys.map((e) => e.value).toList(),
       "leafs": Map.fromEntries(leafs.map((e) => e.toMapEntry())),
+      "leafRcyclBin": Map.fromEntries(leafRcyclBin.map((e) => e.toMapEntry())),
       "relations": realtions.map((source, destinations) =>
           MapEntry(source.value, destinations.map((e) => e.value).toList()))
     };
@@ -171,20 +251,13 @@ class Repo {
     // Directory exePath = File(Platform.resolvedExecutable).parent;
 
     //创建repo文件夹
-    Directory repoPath = Directory(Platform.resolvedExecutable.substring(
-            0,
-            (Platform.resolvedExecutable.length -
-                Platform.resolvedExecutable
-                    .split(Platform.pathSeparator)
-                    .last
-                    .length -
-                1)) +
-        Platform.pathSeparator +
-        "repos" +
-        Platform.pathSeparator +
-        nowUnixEpoch.toString() +
-        "T");
-    await repoPath.create(recursive: true);
+    //同时创建回收站文件夹
+    String repoPath =
+        "${Platform.resolvedExecutable.substring(0, (Platform.resolvedExecutable.length - Platform.resolvedExecutable.split(Platform.pathSeparator).last.length - 1))}${Platform.pathSeparator}repos${Platform.pathSeparator}${nowUnixEpoch}T";
+    Directory recycleBinPath =
+        Directory("$repoPath${Platform.pathSeparator}recycleBin");
+
+    await recycleBinPath.create(recursive: true);
 
     //生成对照表
     Map<String, String> newComparsionTab = {};
@@ -197,12 +270,12 @@ class Repo {
     return Repo(
         repoName,
         nowUnixEpoch.toString() + "T",
-        repoPath.path,
+        repoPath,
         autoSave,
         newComparsionTab,
         autoSaveIntervalMinutes,
         autoSaveNums,
-        null, [], [], {});
+        null, [], [], [], {});
   }
 
   static fromJson(String jsonFilePath) {
@@ -220,6 +293,16 @@ class Repo {
       leafList.add(
           Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
     });
+
+//leafIdName , annotation
+    tempPair = repoJsonObj["leafRcyclBin"];
+
+    List<Leaf> leafRcyclBin = [];
+    tempPair.forEach((leafIdName, annotation) {
+      leafRcyclBin.add(
+          Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
+    });
+
     String headerLeafIdName = repoJsonObj["headerLeaf"];
 
     List<String> rootsIdNames = List<String>.from(repoJsonObj["roots"]);
@@ -252,6 +335,7 @@ class Repo {
         ValueKey(headerLeafIdName),
         rootsKeys,
         leafList,
+        leafRcyclBin,
         realtionKeys);
   }
 
@@ -266,6 +350,7 @@ class Repo {
       this.headerLeafKey,
       this.rootLeafKeys,
       this.leafs,
+      this.leafRcyclBin,
       this.realtions) {
     repoKey = ValueKey(repoName);
   }
