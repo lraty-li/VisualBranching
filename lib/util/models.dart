@@ -81,7 +81,7 @@ class Repo {
     //todo impl
   }
 
-  newLeaf(NodeType nodeType, String leafAnnotation) async {
+  Future<Leaf> newLeaf(NodeType nodeType, String leafAnnotation) async {
     //创建一个leaf，并进行实际文件复制，并加入到repo
     final nowUnixEpoch = DateTime.now().millisecondsSinceEpoch;
 
@@ -116,11 +116,19 @@ class Repo {
       rootLeafKeys.add(newLeaf.leafKey);
       headerLeafKey = newLeaf.leafKey;
     } else {
-      realtions[headerLeafKey]?.add(newLeaf.leafKey);
+      if (realtions[headerLeafKey as ValueKey<String>] == null) {
+        realtions[headerLeafKey as ValueKey<String>] = [newLeaf.leafKey];
+      } else {
+        realtions[headerLeafKey as ValueKey<String>]?.add(newLeaf.leafKey);
+      }
     }
 
 //永远推进标头
     headerLeafKey = newLeaf.leafKey;
+    //todo IO频繁？
+    toJsonFile();
+
+    return newLeaf;
   }
 
   loadLeaf() {}
@@ -218,17 +226,25 @@ class Repo {
     List<ValueKey<String>> rootsKeys =
         rootsIdNames.map((e) => ValueKey(e)).toList();
 
-    Map<String, List<String>> realtionsidNames =
-        Map.from(repoJsonObj["relations"]);
+    Map temp = repoJsonObj["relations"];
+    Map<String, List<String>> realtionsidNames = {};
+    temp.forEach((key, value) {
+      realtionsidNames[key] = List<String>.from(value);
+    });
+
     Map<ValueKey<String>, List<ValueKey<String>>> realtionKeys =
-        realtionsidNames.map((srcIdName, DesIdNames) => MapEntry(
+        realtionsidNames.map((srcIdName, desIdNames) => MapEntry(
             ValueKey(srcIdName),
-            DesIdNames.map((idName) => ValueKey(idName)).toList()));
+            desIdNames.map((idName) => ValueKey(idName)).toList()));
 
     return Repo(
         repoJsonObj["config"]["repoName"],
         repoJsonObj["repoIdName"],
-        jsonFile.path,
+        jsonFilePath.substring(
+            0,
+            jsonFilePath.length -
+                jsonFilePath.split(Platform.pathSeparator).last.length -
+                1),
         repoJsonObj["config"]["autoSave"],
         Map.from(repoJsonObj["config"]["conparsionTable"]),
         repoJsonObj["config"]["autoSaveInterval"],

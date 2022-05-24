@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visual_branching/MainUi/RootNodesView.dart';
 import 'package:visual_branching/TreeViewer/View.dart';
-import 'package:visual_branching/providers/OpenedRepos.dart';
+import 'package:visual_branching/providers/MainStatus.dart';
 import 'MainUi/CtlBtn.dart';
 import 'MainUi/WindowTitleBar.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
         SizedBox(
           height: MediaQuery.of(context).size.height - appWindow.titleBarHeight,
           width: MediaQuery.of(context).size.width,
-          child: Consumer<OpenedRepos>(
+          child: Consumer<MainStatus>(
             builder: (context, provider, child) =>
                 provider.openedRepoList.isEmpty
                     //未开启任何repo时

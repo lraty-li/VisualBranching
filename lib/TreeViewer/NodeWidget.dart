@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visual_branching/TreeViewer/NodeTapMenu.dart';
-import 'package:visual_branching/providers/OpenedRepos.dart';
+import 'package:visual_branching/providers/MainStatus.dart';
 import 'package:visual_branching/util/funcs.dart';
 import 'package:visual_branching/util/models.dart';
 
@@ -25,7 +25,7 @@ class _NodeWidgetState extends State<NodeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<OpenedRepos>(
+    return Consumer<MainStatus>(
       builder: (context, provider, child) {
         return InkWell(
           // hoverColor: Colors.red,
@@ -47,7 +47,7 @@ class _NodeWidgetState extends State<NodeWidget> {
           // onHover: (hovering) => {print("LINE 14 NodeWidget.dart")},
           child: Container(
             decoration: BoxDecoration(
-                color: Provider.of<OpenedRepos>(context)
+                color: Provider.of<MainStatus>(context)
                             .openedRepoList
                             .first
                             .headerLeafKey ==

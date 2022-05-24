@@ -6,7 +6,7 @@ import 'package:graphview/GraphView.dart';
 import 'package:provider/provider.dart';
 import 'package:visual_branching/Repository/OepnRepo.dart';
 import 'package:visual_branching/TreeViewer/dataClass.dart';
-import 'package:visual_branching/providers/OpenedRepos.dart';
+import 'package:visual_branching/providers/MainStatus.dart';
 import 'package:visual_branching/util/models.dart';
 
 import 'NodeWidget.dart';
@@ -19,7 +19,7 @@ class TreeView extends StatefulWidget {
 }
 
 class _TreeViewState extends State<TreeView> {
-  final Graph graph = Graph()..isTree = true;
+  // final Graph graph = Graph()..isTree = true;
 
   Node currBaseNode = Node.Id("defaultNode");
   BuchheimWalkerConfiguration builder = BuchheimWalkerConfiguration();
@@ -29,7 +29,7 @@ class _TreeViewState extends State<TreeView> {
     super.initState();
 
 //todo  初始node id设置？
-    graph.addNode(currBaseNode);
+    // graph.addNode(currBaseNode);
 
     builder
       ..siblingSeparation = (100)
@@ -49,53 +49,54 @@ class _TreeViewState extends State<TreeView> {
 
   @override
   Widget build(BuildContext context) {
-    //todo 重置graph
+    //重置graph
     //先添加新head
 
+    //todo repo 与graph 对应
+
     var headNode = Node.Id(
-        Provider.of<OpenedRepos>(context).openedRepoList.first.repoName);
-    graph.addNode(headNode);
+        Provider.of<MainStatus>(context).openedRepoList.first.repoName);
+    Provider.of<MainStatus>(context).graphs.first.addNode(headNode);
     
     //删除旧head，
-    graph.removeNode(currBaseNode);
+    Provider.of<MainStatus>(context).graphs.first.removeNode(currBaseNode);
 
     currBaseNode=headNode;
 
-    if (Provider.of<OpenedRepos>(context).openedRepoList.isNotEmpty) {
+    if (Provider.of<MainStatus>(context).openedRepoList.isNotEmpty) {
       //添加关系
-      Provider.of<OpenedRepos>(context)
+      Provider.of<MainStatus>(context)
           .openedRepoList
           .first
           .realtions
           .forEach((srcLeaf, desLeafs) {
         for (ValueKey dstLeaf in desLeafs) {
-          graph.addEdge(Node.Id(srcLeaf.value), Node.Id(dstLeaf.value));
+          Provider.of<MainStatus>(context).graphs.first.addEdge(Node.Id(srcLeaf.value), Node.Id(dstLeaf.value));
         }
       });
 
       //将根节点（roots）绑到 defaultNode
-      Provider.of<OpenedRepos>(context)
+      Provider.of<MainStatus>(context)
           .openedRepoList
           .first
           .rootLeafKeys
           .forEach((rootLeaf) {
-        graph.addEdge(currBaseNode, Node.Id(rootLeaf.value));
+        Provider.of<MainStatus>(context).graphs.first.addEdge(currBaseNode, Node.Id(rootLeaf.value));
       });
     } else {
       //todo no leaf?
 
     }
 
-    print("line64 hi");
     //todo 去除consumer
-    return Consumer<OpenedRepos>(
+    return Consumer<MainStatus>(
       builder: (context, provider, child) => InteractiveViewer(
           constrained: false,
           boundaryMargin: EdgeInsets.all(double.infinity),
           minScale: 0.001,
           maxScale: 50,
           child: GraphView(
-            graph: graph,
+            graph: Provider.of<MainStatus>(context).graphs.first,
             algorithm:
                 BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
             paint: Paint()

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/providers/OpenedRepos.dart';
+import 'package:visual_branching/providers/MainStatus.dart';
 
 import 'mainPage.dart';
 
 void main() {
   runApp(MultiProvider(
-      providers: [ListenableProvider<OpenedRepos>(create: (context) => OpenedRepos())],
+      providers: [ListenableProvider<MainStatus>(create: (context) => MainStatus())],
       child: const MyApp()));
   doWhenWindowReady(() {
     final win = appWindow;

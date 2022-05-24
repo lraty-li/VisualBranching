@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/providers/OpenedRepos.dart';
+import 'package:visual_branching/providers/MainStatus.dart';
 
 class RootsListView extends StatelessWidget {
   const RootsListView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<OpenedRepos>(builder: (context, provider, child) {
+    return Consumer<MainStatus>(builder: (context, provider, child) {
       if (provider.openedRepoList.length > 0) {
         return ListView.builder(
           itemCount: provider.openedRepoList.first.rootLeafKeys.length,
