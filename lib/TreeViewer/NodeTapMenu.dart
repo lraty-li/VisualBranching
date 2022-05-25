@@ -5,6 +5,8 @@ import 'package:visual_branching/providers/MainStatus.dart';
 import 'package:visual_branching/util/common.dart';
 import 'dart:io';
 
+import 'package:visual_branching/util/funcs.dart';
+
 void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
   if (!Provider.of<MainStatus>(context, listen: false)
       .openedRepoList
@@ -20,7 +22,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: Text("选择"),
+          title: Text("节点选项"),
           children: [
             SimpleDialogOption(
                 child: Text("回档到该节点"),
@@ -69,6 +71,25 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                       windows: true);
                   //todo 出错控制
                   if (!await launchUrl(path)) throw 'Could not launch $path';
+                })),
+            SimpleDialogOption(
+                child: Text("修改备注"),
+                onPressed: (() async {
+                  final targetLeaf =
+                      Provider.of<MainStatus>(context, listen: false)
+                          .openedRepoList
+                          .first
+                          .leafs
+                          .firstWhere((element) => element.leafKey == nodeKey);
+                  String? newAnnotation =
+                      await strDialog(context, "修改备注", targetLeaf.annotation);
+
+                  targetLeaf.annotation = "$newAnnotation";
+
+                  Provider.of<MainStatus>(context, listen: false)
+                      .updateVoidCall();
+
+                  Navigator.of(context).pop();
                 })),
             SimpleDialogOption(
                 child: Text("删除该节点"),
