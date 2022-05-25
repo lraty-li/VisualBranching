@@ -179,6 +179,7 @@ class Repo {
           int youngestChild = 0;
           ValueKey<String> maxLeafKey = const ValueKey("");
           for (var childLeafKey in downStream.value) {
+            //毫秒数对比更快？
             final millSeconds = _parseStamp(childLeafKey.value);
             if (millSeconds > youngestChild) {
               youngestChild = millSeconds;
@@ -415,14 +416,14 @@ class Repo {
 }
 
 class Leaf {
-  //todo 通过leaf名字字符串生成
+  //通过leaf名字字符串生成
+  //leaf名称 前缀为创建时间的utc Linux时间戳
   late ValueKey<String> leafKey;
 
   //由leaf名字 字符串最后一个字母决定，M手动管理，A自动管理
   late bool canEdit;
 
-  //leaf名称 前缀为创建时间的utc Linux时间戳
-  // late DateTime createdTime;
+  late DateTime createdTime;
 
   // late String filePath;
   late String annotation;
@@ -440,5 +441,14 @@ class Leaf {
   //       leafAnnotation);
   // }
 
-  Leaf(this.leafKey, this.canEdit, this.annotation);
+  Leaf(this.leafKey, this.canEdit, this.annotation) {
+    if (leafKey.value.isEmpty) {
+      //todo 时区问题?
+      createdTime = DateTime.now();
+      return;
+    } else {
+      createdTime = DateTime.fromMillisecondsSinceEpoch(
+          int.parse(leafKey.value.substring(0, leafKey.value.length - 2)));
+    }
+  }
 }

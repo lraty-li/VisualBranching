@@ -5,6 +5,7 @@ import 'package:visual_branching/providers/MainStatus.dart';
 import 'package:visual_branching/util/funcs.dart';
 import 'package:visual_branching/util/models.dart';
 
+//todo 改位staless？
 class NodeWidget extends StatefulWidget {
   final ValueKey<String> leafkey;
   const NodeWidget({Key? key, required ValueKey<String> this.leafkey})
@@ -58,13 +59,17 @@ class _NodeWidgetState extends State<NodeWidget> {
                 widget.leafkey.value,
               ),
 
-              //todo 简化
-              if (provider.openedRepoList.first.leafs.isNotEmpty)
-                Text(provider.openedRepoList.first.leafs
-                    .firstWhere((element) => element.leafKey == widget.leafkey,
-                        orElse: () =>
-                            Leaf(const ValueKey(""), false, "no anotation"))
-                    .annotation)
+              //todo repoName 节点的信息冗余（去掉orElse？
+              Text(provider.openedRepoList.first.leafs
+                  .firstWhere((element) => element.leafKey == widget.leafkey,
+                      orElse: () => Leaf(const ValueKey(""), false, ""))
+                  .createdTime
+                  .toString()),
+              //当创建repo 名字的node时，会转入orElse
+              Text(provider.openedRepoList.first.leafs
+                  .firstWhere((element) => element.leafKey == widget.leafkey,
+                      orElse: () => Leaf(const ValueKey(""), false, ""))
+                  .annotation)
             ]),
           ),
         );
