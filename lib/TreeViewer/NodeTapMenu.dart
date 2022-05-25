@@ -73,16 +73,12 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
             SimpleDialogOption(
                 child: Text("修改备注"),
                 onPressed: (() async {
-                  final targetLeaf =
-                      Provider.of<MainStatus>(context, listen: false)
-                          .openedRepoList
-                          .first
-                          .leafs
-                          .firstWhere((element) => element.leafKey == nodeKey);
                   String? newAnnotation =
-                      await strDialog(context, "修改备注", targetLeaf.annotation);
-
-                  targetLeaf.annotation = "$newAnnotation";
+                      await strDialog(context, "修改备注", "输入新备注");
+                  Provider.of<MainStatus>(context, listen: false)
+                      .openedRepoList
+                      .first
+                      .alterLeafAnno(nodeKey, newAnnotation ?? "");
 
                   Provider.of<MainStatus>(context, listen: false)
                       .updateVoidCall();

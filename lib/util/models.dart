@@ -150,8 +150,7 @@ class Repo {
         CopyDirection.target2Leaf);
 
     //覆盖到目标文件处
-    _copyTo(genLeafPath(targetLeafKey),
-        CopyDirection.leaf2Target);
+    _copyTo(genLeafPath(targetLeafKey), CopyDirection.leaf2Target);
 
     //移动标头到回退到的leaf
     headerLeafKey = targetLeafKey as ValueKey<String>?;
@@ -299,6 +298,12 @@ class Repo {
     toJsonFile();
 
     return newLeaf;
+  }
+
+  alterLeafAnno(ValueKey leafKey, String newAnno) {
+    leafs.firstWhere((element) => element.leafKey == leafKey).annotation =
+        newAnno;
+    toJsonFile();
   }
 
   toJsonFile() {
