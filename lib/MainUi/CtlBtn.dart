@@ -16,15 +16,23 @@ class CtlBtn extends StatelessWidget {
         onTapFunc: (provider) async {
           final tempOldheaderId =
               "${provider.openedRepoList.first.headerLeafKey?.value}";
-          Future<Leaf> newleafFuture =
-              provider.openedRepoList.first.newLeaf(NodeType.manually, "新建节点");
+          Future<Leaf> newleafFuture = provider.openedRepoList.first
+              .newLeaf(NodeType.manually, "新建节点", false);
           newleafFuture.then((newLeaf) {
             //加入graph，
 
-            // //todo 空标头?
-            provider.graphs.first.addEdge(
-                provider.graphs.first.getNodeUsingId(tempOldheaderId),
-                Node.Id(newLeaf.leafKey.value));
+            if (tempOldheaderId.isEmpty) {
+              provider.graphs.first.addEdge(
+                  provider.graphs.first.getNodeUsingId(tempOldheaderId),
+                  Node.Id(newLeaf.leafKey.value));
+            } else {
+// 当标头为空（一个节点都没有）
+
+              provider.graphs.first.addEdge(
+                  provider.graphs.first
+                      .getNodeUsingId(provider.openedRepoList.first.repoName),
+                  Node.Id(newLeaf.leafKey.value));
+            }
 
             //test
             // graph.addEdge(graph.getNodeAtPosition(graph.nodes.length - 2),

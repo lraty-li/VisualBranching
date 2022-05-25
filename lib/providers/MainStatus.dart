@@ -8,6 +8,7 @@ class MainStatus extends ChangeNotifier {
   List<Graph> graphs=[];
 
   updateVoidCall() {
+    //todo 单个repo调用时导致全部更新（虽然目前不支持打开多个repo）
     notifyListeners();
   }
 

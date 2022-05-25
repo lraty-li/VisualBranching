@@ -30,7 +30,6 @@ class _NodeWidgetState extends State<NodeWidget> {
         return InkWell(
           // hoverColor: Colors.red,
           onLongPress: () async {
-            // treeModel.add(widget.data.nodeKey);
             // String? str =
             //     await strDialog(context, "修改备注", widget.data.annotation);
 

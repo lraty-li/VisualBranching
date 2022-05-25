@@ -39,7 +39,7 @@ void newRepoDialog(BuildContext context) {
 
                                 //创建一个手动备份作为新树根节点，并将会被设置为标头
                                 await theCreatorRepo.newLeaf(
-                                    NodeType.manually, "这是一个自动创建的手动备份");
+                                    NodeType.manually, "这是一个自动创建的手动备份",false);
 
                                 if (repoConfig.autoSave) {
                                   //创建第一个自动备份

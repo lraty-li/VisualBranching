@@ -70,6 +70,10 @@ class Repo {
     }
   }
 
+  static int _parseStamp(String leafIdName) {
+    return int.parse(leafIdName.substring(0, leafIdName.length - 2));
+  }
+
   _copyTo(String filePath, CopyDirection direction) {
     //todo 异步
     Directory checkDir = Directory(filePath);
@@ -138,24 +142,75 @@ class Repo {
     toJsonFile();
   }
 
-  delLeaf(ValueKey targetLeafKey) async {
+  delLeaf(ValueKey<String> targetLeafKey) async {
     //移动节点(逻辑删除,移动到回收站List)
     Leaf targetLeaf =
         leafs.firstWhere((element) => element.leafKey == targetLeafKey);
     leafRcyclBin.add(targetLeaf);
     leafs.remove(targetLeaf);
 
-    //todo 清除relation
+    //更新relation
+    // 将子节点连到父节点
+
+    MapEntry<ValueKey<String>, List<ValueKey<String>>> upStream = realtions
+        .entries
+        .firstWhere((pair) => pair.value.contains(targetLeafKey),
+            orElse: () => const MapEntry(ValueKey(""), []));
+    MapEntry<ValueKey<String>, List<ValueKey<String>>> downStream =
+        realtions.entries.firstWhere((pair) => pair.key == targetLeafKey,
+            orElse: () => const MapEntry(ValueKey(""), []));
+
+//todo 当被删除节点为标头，向上设为父节点，向下寻找子节点中创建时间最晚的，或空（整个repo最后一个节点）
+    if (upStream.value.isEmpty && downStream.value.isEmpty) {
+      //只有一个节点
+      headerLeafKey = null;
+      rootLeafKeys.remove(targetLeafKey);
+    } else {
+      if (downStream.value.isEmpty) {
+        //当要删除的leaf为分支末尾时，找不到子节点
+        realtions[upStream.key]?.remove(targetLeafKey);
+        if (headerLeafKey == targetLeafKey) {
+          //设置标头为父节点
+          headerLeafKey = upStream.key;
+        }
+      } else {
+        if (headerLeafKey == targetLeafKey) {
+          //设置标头为子节点中最晚创建的
+          int youngestChild = 0;
+          ValueKey<String> maxLeafKey = const ValueKey("");
+          for (var childLeafKey in downStream.value) {
+            final millSeconds = _parseStamp(childLeafKey.value);
+            if (millSeconds > youngestChild) {
+              youngestChild = millSeconds;
+              maxLeafKey = childLeafKey;
+            }
+          }
+          headerLeafKey = maxLeafKey;
+        }
+        if (upStream.value.isEmpty) {
+          //当要删除的leaf为root节点，找不到父节点
+
+          realtions.remove(downStream.key);
+
+          rootLeafKeys.remove(targetLeafKey);
+          rootLeafKeys.addAll(downStream.value);
+        } else {
+          realtions[upStream.key]?.addAll(downStream.value);
+          realtions[upStream.key]?.remove(targetLeafKey);
+          realtions.remove(downStream.key);
+        }
+      }
+    }
 
     //移动文件
 
     String leafPath =
-        repoName + Platform.pathSeparator + targetLeaf.leafKey.value;
+        repoPath + Platform.pathSeparator + targetLeaf.leafKey.value;
 
     final leafDircetory = Directory(leafPath);
     final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
 
-//todo 异步
+    //todo 异步 放到函数开始？
 
     if (Directory(recyclePath).existsSync()) {
       try {
@@ -163,7 +218,7 @@ class Repo {
             "$repoPath${Platform.pathSeparator}recycleBin${Platform.pathSeparator}${targetLeaf.leafKey.value}");
       } on FileSystemException catch (e) {
         //文件夹移动失败
-
+        print(e);
       }
     } else {
       //todo 垃圾桶不存在
@@ -171,10 +226,12 @@ class Repo {
 
     //todo 垃圾桶清理
 
+    toJsonFile();
     //外部刷新
   }
 
-  Future<Leaf> newLeaf(NodeType nodeType, String leafAnnotation) async {
+  Future<Leaf> newLeaf(
+      NodeType nodeType, String leafAnnotation, bool isRoot) async {
     //创建一个leaf，并进行实际文件复制，并加入到repo
     final nowUnixEpoch = DateTime.now().millisecondsSinceEpoch;
 
@@ -192,11 +249,12 @@ class Repo {
     _copyTo(leafPath.path, CopyDirection.target2Leaf);
 
     leafs.add(newLeaf);
-    if (headerLeafKey == null) {
+    if (headerLeafKey == null || isRoot) {
       //无标头节点
       rootLeafKeys.add(newLeaf.leafKey);
       headerLeafKey = newLeaf.leafKey;
     } else {
+      //todo 简化？
       if (realtions[headerLeafKey as ValueKey<String>] == null) {
         realtions[headerLeafKey as ValueKey<String>] = [newLeaf.leafKey];
       } else {
@@ -303,7 +361,7 @@ class Repo {
           Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
     });
 
-    String headerLeafIdName = repoJsonObj["headerLeaf"];
+    String? headerLeafIdName = repoJsonObj["headerLeaf"];
 
     List<String> rootsIdNames = List<String>.from(repoJsonObj["roots"]);
     List<ValueKey<String>> rootsKeys =
@@ -332,7 +390,7 @@ class Repo {
         Map.from(repoJsonObj["config"]["conparsionTable"]),
         repoJsonObj["config"]["autoSaveInterval"],
         repoJsonObj["config"]["autoSaveNums"],
-        ValueKey(headerLeafIdName),
+        headerLeafIdName == null ? null : ValueKey(headerLeafIdName),
         rootsKeys,
         leafList,
         leafRcyclBin,
