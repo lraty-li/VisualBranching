@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:visual_branching/providers/MainStatus.dart';
 import 'package:visual_branching/util/common.dart';
+import 'dart:io';
 
 void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
   if (!Provider.of<MainStatus>(context, listen: false)
@@ -54,7 +56,20 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
 
                   Navigator.of(context).pop();
                 })),
-            SimpleDialogOption(child: Text("打开节点文件路径"), onPressed: (() {})),
+            SimpleDialogOption(
+                child: Text("打开节点文件路径"),
+                onPressed: (() async {
+                  final path = Uri.file(
+                      Provider.of<MainStatus>(context, listen: false)
+                              .openedRepoList
+                              .first
+                              .repoPath +
+                          Platform.pathSeparator +
+                          nodeKey.value,
+                      windows: true);
+                  //todo 出错控制
+                  if (!await launchUrl(path)) throw 'Could not launch $path';
+                })),
             SimpleDialogOption(
                 child: Text("删除该节点"),
                 onPressed: (() {
