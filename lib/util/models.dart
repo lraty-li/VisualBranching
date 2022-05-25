@@ -90,14 +90,19 @@ class Repo {
           //创建文件路径，复制文件
           comparionTable.forEach((saveFileName, targetFileAbsPath) {
             File tempFile = File(targetFileAbsPath);
-            tempFile.copySync(filePath + Platform.pathSeparator + saveFileName);
+            //todo 异步
+            if (tempFile.existsSync()) {
+              tempFile
+                  .copySync(filePath + Platform.pathSeparator + saveFileName);
+            } else {
+              //todo 目标文件被删除，如何警告？
+              print(" 目标文件被删除");
+            }
           });
         }
         break;
       case CopyDirection.leaf2Target:
         {
-          //todo 先将现有target存入缓冲区(回收站)
-
           //覆盖目标文件
           comparionTable.forEach((saveFileName, targetFileAbsPath) {
             File tempFile =
@@ -113,7 +118,12 @@ class Repo {
     //todo impl
   }
 
-  retirveToLeaf(ValueKey targetLeafKey) {
+  Leaf _getLastLeaf() {
+    return leafs.reduce((value, element) =>
+        element.createdTime.isAfter(value.createdTime) ? element : value);
+  }
+
+  retirveToLeaf(ValueKey<String> targetLeafKey) {
     //不会出现不在leafs中的key
     // final targetLeaf =
     //     leafs.firstWhere((element) => element.leafKey == targetLeafKey);
@@ -160,10 +170,22 @@ class Repo {
         realtions.entries.firstWhere((pair) => pair.key == targetLeafKey,
             orElse: () => const MapEntry(ValueKey(""), []));
 
-//todo 当被删除节点为标头，向上设为父节点，向下寻找子节点中创建时间最晚的，或空（整个repo最后一个节点）
+// 当被删除节点为标头，向上设为父节点，向下寻找子节点中创建时间最晚的，或空（整个repo最后一个节点）
+
     if (upStream.value.isEmpty && downStream.value.isEmpty) {
-      //只有一个节点
-      headerLeafKey = null;
+      if (leafs.isEmpty) {
+        //只有目标一个节点（已被移除）
+        headerLeafKey = null;
+      } else {
+        // todo 当移除某个分支上的唯一节点（没有父子）
+
+        //删除的是某个分支的唯一节点，不动标头
+
+        //退到leaf数组最新的节点
+        if (targetLeafKey == headerLeafKey) {
+          headerLeafKey = _getLastLeaf().leafKey;
+        }
+      }
       rootLeafKeys.remove(targetLeafKey);
     } else {
       if (downStream.value.isEmpty) {

@@ -22,33 +22,33 @@ class CtlBtn extends StatelessWidget {
             //加入graph，
 
             if (tempOldheaderId.isEmpty) {
+// 当标头为空（一个节点都没有）
               provider.graphs.first.addEdge(
                   provider.graphs.first.getNodeUsingId(tempOldheaderId),
                   Node.Id(newLeaf.leafKey.value));
             } else {
-// 当标头为空（一个节点都没有）
-
               provider.graphs.first.addEdge(
                   provider.graphs.first
                       .getNodeUsingId(provider.openedRepoList.first.repoName),
                   Node.Id(newLeaf.leafKey.value));
             }
 
-            //test
-            // graph.addEdge(graph.getNodeAtPosition(graph.nodes.length - 2),
-            //     graph.getNodeAtPosition(graph.nodes.length - 1));
-
-            //todo set state？
             provider.updateVoidCall();
-            // setState(() {});
           });
         },
       ),
       _styledBtn(
           text: "回退到标头",
-          onTapFunc: (mainstat) {
-            //todo 回退逻辑
-            // repo.newLeaf(NodeType.manually, "新建节点");
+          onTapFunc: (provider) {
+            final tempOldheaderId =
+                provider.openedRepoList.first.headerLeafKey?.value;
+            if (tempOldheaderId == null) {
+              // 当标头为空（一个节点都没有）
+
+            } else {
+              provider.openedRepoList.first
+                  .retirveToLeaf(ValueKey(tempOldheaderId));
+            }
           }),
     ]);
   }
@@ -59,10 +59,7 @@ class _styledBtn extends StatelessWidget {
 
   final void Function(MainStatus) onTapFunc;
   // _styledBtn(this.text);
-  const _styledBtn(
-      {Key? key,
-      required this.text,
-      required void Function(MainStatus) this.onTapFunc})
+  const _styledBtn({Key? key, required this.text, required this.onTapFunc})
       : super(key: key);
 
   @override

@@ -22,7 +22,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: Text("节点选项"),
+          title: Text(nodeKey.value),
           children: [
             SimpleDialogOption(
                 child: Text("回档到该节点"),
