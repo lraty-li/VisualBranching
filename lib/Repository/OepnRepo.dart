@@ -15,8 +15,8 @@ void openRepoDialog(BuildContext context) {
                     width: MediaQuery.of(context).size.width * 0.5,
                     height: MediaQuery.of(context).size.height * 0.6,
                     child: loadRepos((repo) {
-                      provider.removeAll();
-                      provider.add(repo);
+                      provider.removeAllOpenedRepo();
+                      provider.addOpenRepo(repo);
                       Navigator.of(context).pop();
                     }),
                   ),

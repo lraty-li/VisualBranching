@@ -13,7 +13,7 @@ class MainStatus extends ChangeNotifier {
   }
 
   /// todo make add list ,run notify listeners only once
-  add(Repo item) {
+  addOpenRepo(Repo item) {
     openedRepoList.add(item);
     graphs.add(Graph()..isTree = true);
     notifyListeners();
@@ -26,7 +26,7 @@ class MainStatus extends ChangeNotifier {
     notifyListeners();
   }
 
-  removeAll() {
+  removeAllOpenedRepo() {
     openedRepoList.clear();
     graphs.clear();
     notifyListeners();
