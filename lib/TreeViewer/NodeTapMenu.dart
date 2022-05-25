@@ -63,11 +63,9 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                 onPressed: (() async {
                   final path = Uri.file(
                       Provider.of<MainStatus>(context, listen: false)
-                              .openedRepoList
-                              .first
-                              .repoPath +
-                          Platform.pathSeparator +
-                          nodeKey.value,
+                          .openedRepoList
+                          .first
+                          .genLeafPath(nodeKey),
                       windows: true);
                   //todo 出错控制
                   if (!await launchUrl(path)) throw 'Could not launch $path';

@@ -26,7 +26,7 @@ class Repo {
   String repoPath;
 
 //标头节点key
-//todo 标头表示最接近真实目标文件状态的版本（节点）?
+//标头表示最接近真实目标文件状态的版本（节点）?
   ValueKey<String>? headerLeafKey;
   // 每棵树的根节点（不可见节点的直接子孩子节点）
   List<ValueKey<String>> rootLeafKeys;
@@ -35,7 +35,15 @@ class Repo {
   //recycle bin
   List<Leaf> leafRcyclBin;
 
+  //auto Saves
+  //todo 取消canEdit？
+  List<Leaf> autoSaves;
+
   Map<ValueKey<String>, List<ValueKey<String>>> realtions;
+
+  String genLeafPath(ValueKey<String> key) {
+    return "$repoPath${Platform.pathSeparator}leafs${Platform.pathSeparator}${key.value}";
+  }
 
   static String _genLeafName(int nowUnixEpoch, NodeType nodeType) {
     switch (nodeType) {
@@ -142,7 +150,7 @@ class Repo {
         CopyDirection.target2Leaf);
 
     //覆盖到目标文件处
-    _copyTo(repoPath + Platform.pathSeparator + targetLeafKey.value,
+    _copyTo(genLeafPath(targetLeafKey),
         CopyDirection.leaf2Target);
 
     //移动标头到回退到的leaf
@@ -227,8 +235,7 @@ class Repo {
 
     //移动文件
 
-    String leafPath =
-        repoPath + Platform.pathSeparator + targetLeaf.leafKey.value;
+    String leafPath = genLeafPath(targetLeafKey);
 
     final leafDircetory = Directory(leafPath);
     final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
@@ -264,8 +271,9 @@ class Repo {
         Leaf(ValueKey(newLeafName), _genCanEdit(nodeType), leafAnnotation);
 
     //创建leaf 文件夹
-    Directory leafPath = Directory(
-        "${Platform.resolvedExecutable.substring(0, (Platform.resolvedExecutable.length - Platform.resolvedExecutable.split(Platform.pathSeparator).last.length - 1))}${Platform.pathSeparator}repos${Platform.pathSeparator}$repoIdName${Platform.pathSeparator}${newLeaf.leafKey.value}");
+
+    Directory leafPath = Directory(genLeafPath(newLeaf.leafKey));
+
     await leafPath.create();
 
     //复制文件
@@ -308,12 +316,12 @@ class Repo {
       "roots": rootLeafKeys.map((e) => e.value).toList(),
       "leafs": Map.fromEntries(leafs.map((e) => e.toMapEntry())),
       "leafRcyclBin": Map.fromEntries(leafRcyclBin.map((e) => e.toMapEntry())),
+      "autoSaves": Map.fromEntries(autoSaves.map((e) => e.toMapEntry())),
       "relations": realtions.map((source, destinations) =>
           MapEntry(source.value, destinations.map((e) => e.value).toList()))
     };
 
-    File jsonFile =
-        File(repoPath + Platform.pathSeparator + repoIdName + ".json");
+    File jsonFile = File("$repoPath${Platform.pathSeparator}$repoIdName.json");
     //todo 异步
     jsonFile.writeAsStringSync(json.encode(repoMap));
   }
@@ -340,6 +348,16 @@ class Repo {
 
     await recycleBinPath.create(recursive: true);
 
+    //创建自动保存文件夹
+    Directory autoSavePath =
+        Directory("$repoPath${Platform.pathSeparator}autoSaves");
+
+    Directory leafsPath = Directory("$repoPath${Platform.pathSeparator}leafs");
+
+    await recycleBinPath.create(recursive: true);
+    await autoSavePath.create(recursive: true);
+    await leafsPath.create(recursive: true);
+
     //生成对照表
     Map<String, String> newComparsionTab = {};
     for (String element in targetFilePaths) {
@@ -350,13 +368,13 @@ class Repo {
 
     return Repo(
         repoName,
-        nowUnixEpoch.toString() + "T",
+        "${nowUnixEpoch}T",
         repoPath,
         autoSave,
         newComparsionTab,
         autoSaveIntervalMinutes,
         autoSaveNums,
-        null, [], [], [], {});
+        null, [], [], [], [], {});
   }
 
   static fromJson(String jsonFilePath) {
@@ -367,20 +385,29 @@ class Repo {
     //todo 错误检测
 
     //leafIdName , annotation
-    Map<String, dynamic> tempPair = repoJsonObj["leafs"];
+    Map<String, dynamic> tempMap = repoJsonObj["leafs"];
 
     List<Leaf> leafList = [];
-    tempPair.forEach((leafIdName, annotation) {
+    tempMap.forEach((leafIdName, annotation) {
       leafList.add(
           Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
     });
 
-//leafIdName , annotation
-    tempPair = repoJsonObj["leafRcyclBin"];
+//parse recycle bin
+    tempMap = repoJsonObj["leafRcyclBin"];
 
     List<Leaf> leafRcyclBin = [];
-    tempPair.forEach((leafIdName, annotation) {
+    tempMap.forEach((leafIdName, annotation) {
       leafRcyclBin.add(
+          Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
+    });
+
+//parse autoSaves
+    tempMap = repoJsonObj["leafRcyclBin"];
+
+    List<Leaf> autoSaves = [];
+    tempMap.forEach((leafIdName, annotation) {
+      autoSaves.add(
           Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
     });
 
@@ -417,6 +444,7 @@ class Repo {
         rootsKeys,
         leafList,
         leafRcyclBin,
+        autoSaves,
         realtionKeys);
   }
 
@@ -432,6 +460,7 @@ class Repo {
       this.rootLeafKeys,
       this.leafs,
       this.leafRcyclBin,
+      this.autoSaves,
       this.realtions) {
     repoKey = ValueKey(repoName);
   }
