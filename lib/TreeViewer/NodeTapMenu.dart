@@ -4,6 +4,16 @@ import 'package:visual_branching/providers/MainStatus.dart';
 import 'package:visual_branching/util/common.dart';
 
 void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
+  if (!Provider.of<MainStatus>(context, listen: false)
+      .openedRepoList
+      .first
+      .leafs
+      .any(
+        (element) => element.leafKey == nodeKey,
+      )) {
+    //点击了头节点，不显示菜单
+    return;
+  }
   showDialog(
       context: context,
       builder: (context) {
