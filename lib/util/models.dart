@@ -282,6 +282,14 @@ class Repo {
     toJsonFile();
   }
 
+  alterRepo(String newRepoName,bool newAutoSave,int newAutoSaveInterval,int newAutoSavesNums) {
+    repoName = newRepoName;
+    isAutoSave = newAutoSave;
+    autoSaveIntevalMins = newAutoSaveInterval;
+    autoSaveNum = newAutoSavesNums;
+    toJsonFile();
+  }
+
   toJsonFile() {
     //todo 直接覆盖文件？
     Map repoMap = {

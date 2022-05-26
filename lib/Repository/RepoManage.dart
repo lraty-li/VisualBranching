@@ -41,17 +41,13 @@ void repoManagDialog(BuildContext context) {
                                     onPressed: repoConfig.validated
                                         ? () async {
                                             // 修改配置
-                                            //todo 移到repo内部？
-                                            repo.repoName = repoConfig.repoName;
-                                            repo.isAutoSave =
-                                                repoConfig.autoSave;
-                                            repo.autoSaveIntevalMins =
-                                                repoConfig.autoSaveInterval;
-                                            repo.autoSaveNum =
-                                                repoConfig.autoSavesNums;
 
-                                            //生成json
-                                            repo.toJsonFile();
+//todo 如果当前被修改repo正在被打开，虽然操作与配置无关，但是否要重新打开？
+                                            repo.alterRepo(
+                                                repoConfig.repoName,
+                                                repoConfig.autoSave,
+                                                repoConfig.autoSaveInterval,
+                                                repoConfig.autoSavesNums);
                                             Navigator.of(context).pop();
                                           }
                                         : null,
