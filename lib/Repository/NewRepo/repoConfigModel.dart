@@ -8,7 +8,7 @@ class RepoConfig extends ChangeNotifier {
   late List<String> targetFilePaths;
   bool validated = false;
 
-  validate() {
+  _validate() {
     if (repoName.isNotEmpty && targetFilePaths.isNotEmpty) {
       if (autoSave) {
         if (autoSavesNums > 0 && autoSaveInterval > 0) {
@@ -28,37 +28,37 @@ class RepoConfig extends ChangeNotifier {
 
   addTarget(String path) {
     targetFilePaths.add(path);
-    validate();
+    _validate();
   }
 
   delTarget(int index) {
     targetFilePaths.removeAt(index);
-    validate();
+    _validate();
   }
 
   clearAllTarget() {
     targetFilePaths.clear();
-    validate();
+    _validate();
   }
 
 
   setRepoName(String newRepoName) {
     repoName = newRepoName;
-    validate();
+    _validate();
   }
 
   setIfAutoSave(bool value) {
     autoSave = value;
-    validate();
+    _validate();
   }
   setAutoSaveIntervel(int value) {
     autoSaveInterval=value;
-    validate();
+    _validate();
   }
 
   setAutoSaveNums(int value) {
     autoSavesNums=value;
-    validate();
+    _validate();
   }
 
   static fromConfig(RepoConfig oldConfig) {
@@ -73,8 +73,8 @@ class RepoConfig extends ChangeNotifier {
   RepoConfig({
     this.repoName = "",
     this.autoSave = false,
-    this.autoSaveInterval = 60,
-    this.autoSavesNums = 40,
+    this.autoSaveInterval = -1,
+    this.autoSavesNums = -1,
     required this.targetFilePaths,
   });
 }

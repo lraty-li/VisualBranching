@@ -49,6 +49,7 @@ class _FileChosingState extends State<FileChosing> {
                       break;
                     }
                   }
+                  //todo batchupdate？
                   if (noSame) widget.configHandle.addTarget(element.path);
                 }
               }

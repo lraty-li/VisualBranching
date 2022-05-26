@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visual_branching/Repository/NewRepo/repoConfigModel.dart';
@@ -15,11 +17,7 @@ void repoManagDialog(BuildContext context) {
             width: MediaQuery.of(context).size.width * 0.5,
             height: MediaQuery.of(context).size.height * 0.6,
             child: loadRepos((repo) {
-              //todo add repo detail and del？
-
-              //打开新建repo界面，根据收到参数修改现有repo
-              //如何禁用文件选择？
-
+              Navigator.of(context).pop();
               showDialog<String?>(
                   context: context,
                   builder: (context) {
@@ -29,16 +27,20 @@ void repoManagDialog(BuildContext context) {
                             autoSave: repo.isAutoSave,
                             autoSaveInterval: repo.autoSaveIntevalMins,
                             autoSavesNums: repo.autoSaveNum,
-                            targetFilePaths: []),
+                            //targetFilePaths is not editable here , simplly set a value to pass the validation
+                            targetFilePaths: const ["noNull"]),
                         child: AlertDialog(
-                            title: Text("${repo.repoName}"),
+                            title: Text(repo.repoName),
                             actions: <Widget>[
                               Consumer<RepoConfig>(
                                 builder: (context, repoConfig, child) {
+                                  print(
+                                      "buttom rebuilded ${repoConfig.validated}");
                                   return ElevatedButton(
                                     onPressed: repoConfig.validated
                                         ? () async {
                                             // 修改配置
+                                            //todo 移到repo内部？
                                             repo.repoName = repoConfig.repoName;
                                             repo.isAutoSave =
                                                 repoConfig.autoSave;
@@ -57,6 +59,12 @@ void repoManagDialog(BuildContext context) {
                                 },
                               ),
                               ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text("取消"),
+                              ),
+                              ElevatedButton(
                                 style: ButtonStyle(
                                     backgroundColor:
                                         MaterialStateProperty.all(Colors.red)),
@@ -66,30 +74,54 @@ void repoManagDialog(BuildContext context) {
                                 },
                                 child: Text("删除库"),
                               ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text("取消"),
-                              ),
                             ],
                             content: SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.7,
                                 height:
                                     MediaQuery.of(context).size.height * 0.5,
-                                child: Flex(
-                                  direction: Axis.horizontal,
-                                  children: [
-                                    Consumer<RepoConfig>(
-                                        builder: (context, repoConfig, child) =>
-                                            Expanded(
-                                              flex: 1,
-                                              child: RepoOptions(
-                                                  configHandle: repoConfig),
-                                            )),
-                                    //todo 不可更改，显示已选文件,
-                                  ],
-                                ))));
+                                child:
+                                    Flex(direction: Axis.horizontal, children: [
+                                  Consumer<RepoConfig>(
+                                      builder: (context, repoConfig, child) =>
+                                          Expanded(
+                                            child: RepoOptions(
+                                                configHandle: repoConfig),
+                                          )),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Flex(
+                                      direction: Axis.vertical,
+                                      children: [
+                                        Text("已选择文件（不可修改)"),
+
+                                        Expanded(
+                                            child: ListView.builder(
+                                                itemCount: repo
+                                                    .comparionTable.keys.length,
+                                                itemBuilder:
+                                                    (BuildContext context,
+                                                        int index) {
+                                                  //todo 检查平台？
+                                                  final splitedStr = repo
+                                                      .comparionTable.values
+                                                      .elementAt(index)
+                                                      .split(Platform
+                                                          .pathSeparator);
+                                                  return ListTile(
+                                                    title: Text(
+                                                      "......${Platform.pathSeparator}${splitedStr[splitedStr.length - 2]}${Platform.pathSeparator}${splitedStr.last}",
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.clip,
+                                                      softWrap: false,
+                                                    ),
+                                                  );
+                                                }))
+                                        //todo 不可更改，显示已选文件,
+                                      ],
+                                    ),
+                                  )
+                                ]))));
                   });
             }),
           ),

@@ -55,8 +55,6 @@ class RRepoOptionsState extends State<RepoOptions> {
               onChanged: (bool? value) {
                 if (value != null) {
                   //todo 优化？
-                  // widget.configHandle.autoSavesNums = value ? 60 : -1;
-                  // widget.configHandle.autoSaveInterval = value ? 40 : -1;
                   widget.configHandle.setIfAutoSave(value);
                 }
               },
@@ -95,7 +93,7 @@ class RRepoOptionsState extends State<RepoOptions> {
               labelText: "自动保存个数上限",
               errorText: _saveNumErrTxt.value,
               hintText: widget.configHandle.autoSavesNums < 0
-                  ? "40"
+                  ? "-1"
                   : widget.configHandle.autoSavesNums.toString()),
           inputFormatters: [
             NumericalRangeFormatter(max: 40, errTxtWarp: _saveNumErrTxt)
