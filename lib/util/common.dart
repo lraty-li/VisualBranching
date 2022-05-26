@@ -14,6 +14,14 @@ enum RepoManagOpt {
 
 enum NodeType { manually, automatically }
 
-enum LeafBelonging { leafs, recycleBin, autoSave }
+enum LeafFrom { leafs, recycleBin, autoSave }
 
-enum CopyDirection { target2Leaf, leaf2Target }
+enum CopyDirection {
+  target2Leaf,
+  target2recycle,
+  target2AutoSave,
+  leaf2Target,
+  leafs2recycle,
+  recycle2Leafs,
+  autoSave2Leafs
+}

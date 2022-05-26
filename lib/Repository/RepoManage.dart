@@ -131,7 +131,3 @@ void repoManagDialog(BuildContext context) {
         );
       });
 }
-
-managRepo(Repo theRepo) {
-  //todo impl
-}

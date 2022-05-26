@@ -30,7 +30,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                   Provider.of<MainStatus>(context, listen: false)
                       .openedRepoList
                       .first
-                      .retirveToLeaf(nodeKey,LeafBelonging.leafs);
+                      .retirveToLeaf(nodeKey,LeafFrom.leafs);
                   Provider.of<MainStatus>(context, listen: false)
                       .updateVoidCall();
 
@@ -65,7 +65,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                       Provider.of<MainStatus>(context, listen: false)
                           .openedRepoList
                           .first
-                          .genLeafPath(nodeKey,LeafBelonging.leafs),
+                          .genLeafPath(nodeKey,LeafFrom.leafs),
                       windows: true);
                   //todo 出错控制
                   if (!await launchUrl(path)) throw 'Could not launch $path';

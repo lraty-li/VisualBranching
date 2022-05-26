@@ -16,16 +16,14 @@ Widget loadRepos(void Function(Repo) onTapfunc) {
   List<Repo> reposList = [];
 
 //读取现有库
-  Directory repoPath = Directory(Platform.resolvedExecutable.substring(
+  Directory repoPath = Directory("${Platform.resolvedExecutable.substring(
           0,
           (Platform.resolvedExecutable.length -
               Platform.resolvedExecutable
                   .split(Platform.pathSeparator)
                   .last
                   .length -
-              1)) +
-      Platform.pathSeparator +
-      "repos");
+              1))}${Platform.pathSeparator}repos");
 
   //todo 异步
   if( !repoPath.existsSync()){
@@ -36,10 +34,7 @@ Widget loadRepos(void Function(Repo) onTapfunc) {
   for (FileSystemEntity element in entitys) {
     if (FileSystemEntity.isDirectorySync(element.path)) {
       //由json新建repo对象
-      reposList.add(Repo.fromJson(element.path +
-          Platform.pathSeparator +
-          element.path.split(Platform.pathSeparator).last +
-          ".json"));
+      reposList.add(Repo.fromJson("${element.path}${Platform.pathSeparator}${element.path.split(Platform.pathSeparator).last}.json"));
     }
   }
 
@@ -51,9 +46,7 @@ Widget loadRepos(void Function(Repo) onTapfunc) {
       return ListTile(
         title: Text(reposList[index].repoName),
         onTap: () {
-          //todo 与 “打开库共用，只修改ontap事件？"
           onTapfunc(reposList[index]);
-          print(index);
         },
         trailing: _ifAutoSaveIcon(reposList[index].isAutoSave),
       );

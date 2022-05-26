@@ -57,13 +57,18 @@ class Repo {
     //todo impl
   }
 
-  Leaf getLeafByKey(ValueKey<String> leafKey) {
-    //todo 确保leafKey 存在？
-    //只在leaf查找?
-    return leafs.firstWhere((element) => element.leafKey == leafKey);
+  Leaf getLeafByKey(ValueKey<String> leafKey, LeafFrom belonging) {
+    switch (belonging) {
+      case LeafFrom.leafs:
+        return leafs.firstWhere((element) => element.leafKey == leafKey);
+      case LeafFrom.recycleBin:
+        return leafRcyclBin.firstWhere((element) => element.leafKey == leafKey);
+      case LeafFrom.autoSave:
+        return autoSaves.firstWhere((element) => element.leafKey == leafKey);
+    }
   }
 
-  _copyTo(String filePath, CopyDirection direction) {
+  _copyTo(String filePath, CopyDirection direction) async {
     //todo 异步
     Directory checkDir = Directory(filePath);
     if (!checkDir.existsSync()) {
@@ -100,24 +105,94 @@ class Repo {
           });
         }
         break;
+      case CopyDirection.recycle2Leafs:
+        {
+          //filePath will be [targetLeaf.leafKey.value] the Id name of leaf, check delLeaf
+          //todo [genLeafPath] 的参数类型可否直接string
+          String leafPath =
+              genLeafPath(ValueKey(filePath), LeafFrom.recycleBin);
+
+          final leafDircetory = Directory(leafPath);
+          final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
+
+          if (Directory(recyclePath).existsSync()) {
+            try {
+              await leafDircetory.rename(
+                  "$repoPath${Platform.pathSeparator}leafs${Platform.pathSeparator}$filePath");
+            } on FileSystemException catch (e) {
+              //文件夹移动失败
+              print(e);
+            }
+          } else {
+            //todo 垃圾桶不存在
+          }
+
+          //todo 垃圾桶清理
+          break;
+        }
+        break;
+      case CopyDirection.leafs2recycle:
+        {
+          //todo 基本一致 [case recycle2Leafs]
+          String leafPath = genLeafPath(ValueKey(filePath), LeafFrom.leafs);
+
+          final leafDircetory = Directory(leafPath);
+          final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
+
+          if (Directory(recyclePath).existsSync()) {
+            try {
+              await leafDircetory.rename(
+                  "$repoPath${Platform.pathSeparator}recycleBin${Platform.pathSeparator}$filePath");
+            } on FileSystemException catch (e) {
+              //文件夹移动失败
+              print(e);
+            }
+          } else {
+            //todo 垃圾桶不存在
+          }
+
+          //todo 垃圾桶清理
+          break;
+        }
+      case CopyDirection.autoSave2Leafs:
+        // TODO: Handle this case.
+        break;
+      case CopyDirection.target2recycle:
+        // todo 与 target2Leaf完全一致,传入参数改为只传leafIdname？
+        {
+          comparionTable.forEach((saveFileName, targetFileAbsPath) {
+            File tempFile = File(targetFileAbsPath);
+            //todo 异步
+            if (tempFile.existsSync()) {
+              tempFile
+                  .copySync(filePath + Platform.pathSeparator + saveFileName);
+            } else {
+              //todo 目标文件被删除，如何警告？
+              print(" 目标文件被删除");
+            }
+          });
+          break;
+        }
+      case CopyDirection.target2AutoSave:
+        // TODO: Handle this case.
+        break;
     }
   }
 
-  String genLeafPath(ValueKey<String> key ,LeafBelonging leafType) {
-    final String LeafBelongPath;
-    switch(leafType){
-      
-      case LeafBelonging.leafs:
-        LeafBelongPath="leafs";
+  String genLeafPath(ValueKey<String> key, LeafFrom leafType) {
+    final String leafBelongPath;
+    switch (leafType) {
+      case LeafFrom.leafs:
+        leafBelongPath = "leafs";
         break;
-      case LeafBelonging.recycleBin:
-        LeafBelongPath="recycleBin";
+      case LeafFrom.recycleBin:
+        leafBelongPath = "recycleBin";
         break;
-      case LeafBelonging.autoSave:
-        LeafBelongPath="autoSaves";
+      case LeafFrom.autoSave:
+        leafBelongPath = "autoSaves";
         break;
     }
-    return "$repoPath${Platform.pathSeparator}$LeafBelongPath${Platform.pathSeparator}${key.value}";
+    return "$repoPath${Platform.pathSeparator}$leafBelongPath${Platform.pathSeparator}${key.value}";
   }
 
   Leaf _getLastLeaf() {
@@ -125,11 +200,35 @@ class Repo {
         element.createdTime.isAfter(value.createdTime) ? element : value);
   }
 
-  retirveToLeaf(ValueKey<String> targetLeafKey,LeafBelonging belonging) {
-    //不会出现不在leafs中的key
+  retirveToLeaf(ValueKey<String> targetLeafKey, LeafFrom belonging) {
+    //targetLeafKey可能来源 回收站/自动保存/leafs
+
+    //todo 新增移动leaf 方法？
+    switch (belonging) {
+      case LeafFrom.leafs:
+        break;
+      case LeafFrom.recycleBin:
+        {
+          final targetLeaf = getLeafByKey(targetLeafKey, LeafFrom.recycleBin);
+          leafs.add(targetLeaf);
+          leafRcyclBin.remove(targetLeaf);
+          //建立关系
+          _headerRelation(targetLeafKey, false);
+          break;
+        }
+      case LeafFrom.autoSave:
+        {
+          final targetLeaf = getLeafByKey(targetLeafKey, LeafFrom.autoSave);
+          leafs.add(targetLeaf);
+          autoSaves.remove(targetLeaf);
+          _headerRelation(targetLeafKey, false);
+          break;
+        }
+    }
 
     //临时leaf,创建一个现有备份，直接送入回收站
     //不能newLeaf方法,不移动标头不创建relation
+
     final backUpLeaf = Leaf(
         ValueKey("${DateTime.now().millisecondsSinceEpoch}NA"),
         false,
@@ -137,12 +236,19 @@ class Repo {
     leafRcyclBin.add(backUpLeaf);
 
     //复制文件直接到回收站
+    //现有新copy方向 [CopyDirection.target2recycle]
     _copyTo(
         "$repoPath${Platform.pathSeparator}recycleBin${Platform.pathSeparator}${backUpLeaf.leafKey.value}",
-        CopyDirection.target2Leaf);
+        CopyDirection.target2recycle);
+    // _copyTo(
+    //     "$repoPath${Platform.pathSeparator}recycleBin${Platform.pathSeparator}${backUpLeaf.leafKey.value}",
+    //     CopyDirection.target2Leaf);
 
     //覆盖到目标文件处
-    _copyTo(genLeafPath(targetLeafKey,belonging), CopyDirection.leaf2Target);
+    _copyTo(genLeafPath(targetLeafKey, belonging), CopyDirection.leaf2Target);
+
+    // 移动节点文件
+    _copyTo(targetLeafKey.value, CopyDirection.recycle2Leafs);
 
     //移动标头到回退到的leaf
     headerLeafKey = targetLeafKey;
@@ -153,7 +259,7 @@ class Repo {
 
   delLeaf(ValueKey<String> targetLeafKey) async {
     //移动节点(逻辑删除,移动到回收站List)
-    Leaf targetLeaf = getLeafByKey(targetLeafKey);
+    Leaf targetLeaf = getLeafByKey(targetLeafKey, LeafFrom.leafs);
     leafRcyclBin.add(targetLeaf);
     leafs.remove(targetLeaf);
 
@@ -224,34 +330,30 @@ class Repo {
     }
 
     //移动文件
-
-    String leafPath = genLeafPath(targetLeafKey,LeafBelonging.leafs);
-
-    final leafDircetory = Directory(leafPath);
-    final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
-
-    //todo 异步 放到函数开始？
-
-    if (Directory(recyclePath).existsSync()) {
-      try {
-        await leafDircetory.rename(
-            "$repoPath${Platform.pathSeparator}recycleBin${Platform.pathSeparator}${targetLeaf.leafKey.value}");
-      } on FileSystemException catch (e) {
-        //文件夹移动失败
-        print(e);
-      }
-    } else {
-      //todo 垃圾桶不存在
-    }
-
-    //todo 垃圾桶清理
+    _copyTo(targetLeafKey.value, CopyDirection.leafs2recycle);
 
     toJsonFile();
     //外部刷新
   }
 
+  _headerRelation(ValueKey<String> newLeafKey, bool setRoot) {
+    //update realation depends on if header exist
+    if (headerLeafKey == null || setRoot) {
+      //无标头节点
+      rootLeafKeys.add(newLeafKey);
+      headerLeafKey = newLeafKey;
+    } else {
+      //todo 简化？(这两行是否等效)
+      if (realtions[headerLeafKey as ValueKey<String>] == null) {
+        realtions[headerLeafKey as ValueKey<String>] = [newLeafKey];
+      } else {
+        realtions[headerLeafKey as ValueKey<String>]?.add(newLeafKey);
+      }
+    }
+  }
+
   Future<Leaf> newLeaf(
-      NodeType nodeType, String leafAnnotation, bool isRoot) async {
+      NodeType nodeType, String leafAnnotation, bool setRoot) async {
     //创建一个leaf，并进行实际文件复制，并加入到repo
     final nowUnixEpoch = DateTime.now().millisecondsSinceEpoch;
 
@@ -262,7 +364,8 @@ class Repo {
 
     //创建leaf 文件夹
 
-    Directory leafPath = Directory(genLeafPath(newLeaf.leafKey,LeafBelonging.leafs));
+    Directory leafPath =
+        Directory(genLeafPath(newLeaf.leafKey, LeafFrom.leafs));
 
     await leafPath.create();
 
@@ -270,18 +373,7 @@ class Repo {
     _copyTo(leafPath.path, CopyDirection.target2Leaf);
 
     leafs.add(newLeaf);
-    if (headerLeafKey == null || isRoot) {
-      //无标头节点
-      rootLeafKeys.add(newLeaf.leafKey);
-      headerLeafKey = newLeaf.leafKey;
-    } else {
-      //todo 简化？
-      if (realtions[headerLeafKey as ValueKey<String>] == null) {
-        realtions[headerLeafKey as ValueKey<String>] = [newLeaf.leafKey];
-      } else {
-        realtions[headerLeafKey as ValueKey<String>]?.add(newLeaf.leafKey);
-      }
-    }
+    _headerRelation(newLeaf.leafKey, setRoot);
 
 //永远推进标头
     headerLeafKey = newLeaf.leafKey;
@@ -292,11 +384,12 @@ class Repo {
   }
 
   alterLeafAnno(ValueKey<String> leafKey, String newAnno) {
-    getLeafByKey(leafKey).annotation = newAnno;
+    getLeafByKey(leafKey, LeafFrom.leafs).annotation = newAnno;
     toJsonFile();
   }
 
-  alterRepo(String newRepoName,bool newAutoSave,int newAutoSaveInterval,int newAutoSavesNums) {
+  alterRepo(String newRepoName, bool newAutoSave, int newAutoSaveInterval,
+      int newAutoSavesNums) {
     repoName = newRepoName;
     isAutoSave = newAutoSave;
     autoSaveIntevalMins = newAutoSaveInterval;

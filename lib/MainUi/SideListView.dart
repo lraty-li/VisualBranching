@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visual_branching/providers/MainStatus.dart';
+import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/models.dart';
 
 class SideListView extends StatelessWidget {
@@ -13,7 +14,7 @@ class SideListView extends StatelessWidget {
       final bool isAutoSave = targetRepo.isAutoSave;
       final List<Leaf> rootLeafs = targetRepo.rootLeafKeys
           .map(
-            (e) => targetRepo.getLeafByKey(e),
+            (e) => targetRepo.getLeafByKey(e, LeafFrom.leafs),
           )
           .toList();
       return DefaultTabController(
@@ -36,14 +37,28 @@ class SideListView extends StatelessWidget {
           ),
           body: TabBarView(
             children: [
-//todo rootleaf 也改为leaf类型？
               //显示节点头
-              _buildListView(rootLeafs),
+              _buildListView(rootLeafs, (index) {
+                print(index);
+              }),
 
               //显示回收站
-              _buildListView(targetRepo.leafRcyclBin),
+              _buildListView(targetRepo.leafRcyclBin, (index) {
+                //不复制， 移动leaf ,
+                //todo 是否修改备注？
+                targetRepo.leafRcyclBin[index].annotation =
+                    "由回收站还原:${targetRepo.leafRcyclBin[index].annotation}";
+                targetRepo.retirveToLeaf(targetRepo.leafRcyclBin[index].leafKey,
+                    LeafFrom.recycleBin);
+                provider.updateVoidCall();
+              }),
               //显示自动保存
-              if (isAutoSave) _buildListView(targetRepo.autoSaves),
+              if (isAutoSave)
+                _buildListView(targetRepo.autoSaves, (index) {
+                  //todo copy the leaf
+                  targetRepo.retirveToLeaf(
+                      targetRepo.autoSaves[index].leafKey, LeafFrom.autoSave);
+                }),
             ],
           ),
         ),
@@ -53,7 +68,8 @@ class SideListView extends StatelessWidget {
 }
 
 //todo impl ontap
-Widget _buildListView(List<Leaf> theList) {
+Widget _buildListView(
+    List<Leaf> theList, void Function(int leafIndex) onTapfunc) {
   Offset tapPosition;
   return ListView.builder(
     //显示节点头
@@ -85,13 +101,16 @@ Widget _buildListView(List<Leaf> theList) {
                       ))
               // This is how you handle user selection
               .then(
-            (value) => print(value),
+            (value) {
+              if (value != null) {
+                onTapfunc(value);
+              }
+            },
           );
         },
         child: ListTile(
           title: _buildBrefTile(theList[index].createdTime.toLocal().toString(),
               theList[index].annotation),
-          //todo impl focus
         ),
       );
     },
