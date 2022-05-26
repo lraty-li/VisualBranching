@@ -13,6 +13,7 @@ class CtlBtn extends StatelessWidget {
     return Column(children: [
       _styledBtn(
         text: "备份到标头",
+        colorData: Colors.blue,
         onTapFunc: (provider) async {
           final tempOldheaderId =
               "${provider.openedRepoList.first.headerLeafKey?.value}";
@@ -39,6 +40,7 @@ class CtlBtn extends StatelessWidget {
       ),
       _styledBtn(
           text: "回退到标头",
+          colorData: Colors.blue,
           onTapFunc: (provider) {
             final tempOldheaderId =
                 provider.openedRepoList.first.headerLeafKey?.value;
@@ -51,16 +53,28 @@ class CtlBtn extends StatelessWidget {
               provider.updateVoidCall();
             }
           }),
+      _styledBtn(
+          text: "清空回收站",
+          colorData: Colors.red,
+          onTapFunc: (provider) {
+            provider.openedRepoList.first.clearRecycleBin();
+            provider.updateVoidCall();
+          })
     ]);
   }
 }
 
 class _styledBtn extends StatelessWidget {
   final String text;
+  final MaterialColor colorData;
 
   final void Function(MainStatus) onTapFunc;
   // _styledBtn(this.text);
-  const _styledBtn({Key? key, required this.text, required this.onTapFunc})
+  const _styledBtn(
+      {Key? key,
+      required this.text,
+      required this.onTapFunc,
+      required this.colorData})
       : super(key: key);
 
   @override
@@ -68,6 +82,8 @@ class _styledBtn extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
         child: ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(colorData)),
             onPressed: () {
               onTapFunc(Provider.of<MainStatus>(context, listen: false));
             },

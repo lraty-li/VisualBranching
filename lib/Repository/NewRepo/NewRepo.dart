@@ -45,8 +45,6 @@ void newRepoDialog(BuildContext context) {
 
                                 }
 
-                                //生成json
-                                theCreatorRepo.toJsonFile();
                                 Navigator.of(context).pop();
                               }
                             : null,

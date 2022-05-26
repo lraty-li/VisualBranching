@@ -66,7 +66,7 @@ class Repo {
     //todo 异步
     Directory checkDir = Directory(filePath);
     if (!checkDir.existsSync()) {
-      checkDir.createSync();
+      checkDir.createSync(recursive: true);
     }
 
     //todo 出错控制
@@ -305,6 +305,18 @@ class Repo {
     File jsonFile = File("$repoPath${Platform.pathSeparator}$repoIdName.json");
     //todo 异步
     jsonFile.writeAsStringSync(json.encode(repoMap));
+  }
+
+  clearRecycleBin() {
+    leafRcyclBin.clear();
+    //删除回收站文件夹
+    //todo 出错控制
+    //todo 常用路径的Directory对象作为repo属性？
+    final recycleBin =
+        Directory(repoPath + Platform.pathSeparator + "recycleBin");
+    recycleBin.deleteSync(recursive: true);
+    recycleBin.createSync();
+    toJsonFile();
   }
 
   static String _genLeafName(int nowUnixEpoch, NodeType nodeType) {
