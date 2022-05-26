@@ -15,7 +15,7 @@ void main() {
     win.minSize = Size(640, 640);
     win.size = initialSize;
     win.alignment = Alignment.center;
-    win.title = "Custom window with Flutter";
+    win.title = "Visual Branching";
     win.show();
   });
 }

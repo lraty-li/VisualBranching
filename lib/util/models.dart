@@ -57,6 +57,11 @@ class Repo {
     //todo impl
   }
 
+  Leaf getLeafByKey(ValueKey<String> leafKey) {
+    //todo 确保leafKey 存在？
+    return leafs.firstWhere((element) => element.leafKey == leafKey);
+  }
+
   _copyTo(String filePath, CopyDirection direction) {
     //todo 异步
     Directory checkDir = Directory(filePath);
@@ -108,8 +113,6 @@ class Repo {
 
   retirveToLeaf(ValueKey<String> targetLeafKey) {
     //不会出现不在leafs中的key
-    // final targetLeaf =
-    //     leafs.firstWhere((element) => element.leafKey == targetLeafKey);
 
     //临时leaf,创建一个现有备份，直接送入回收站
     //不能newLeaf方法,不移动标头不创建relation
@@ -136,8 +139,7 @@ class Repo {
 
   delLeaf(ValueKey<String> targetLeafKey) async {
     //移动节点(逻辑删除,移动到回收站List)
-    Leaf targetLeaf =
-        leafs.firstWhere((element) => element.leafKey == targetLeafKey);
+    Leaf targetLeaf = getLeafByKey(targetLeafKey);
     leafRcyclBin.add(targetLeaf);
     leafs.remove(targetLeaf);
 
@@ -275,9 +277,8 @@ class Repo {
     return newLeaf;
   }
 
-  alterLeafAnno(ValueKey leafKey, String newAnno) {
-    leafs.firstWhere((element) => element.leafKey == leafKey).annotation =
-        newAnno;
+  alterLeafAnno(ValueKey<String> leafKey, String newAnno) {
+    getLeafByKey(leafKey).annotation = newAnno;
     toJsonFile();
   }
 
