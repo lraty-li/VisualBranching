@@ -59,6 +59,7 @@ class Repo {
 
   Leaf getLeafByKey(ValueKey<String> leafKey) {
     //todo 确保leafKey 存在？
+    //只在leaf查找?
     return leafs.firstWhere((element) => element.leafKey == leafKey);
   }
 
@@ -102,8 +103,21 @@ class Repo {
     }
   }
 
-  String genLeafPath(ValueKey<String> key) {
-    return "$repoPath${Platform.pathSeparator}leafs${Platform.pathSeparator}${key.value}";
+  String genLeafPath(ValueKey<String> key ,LeafBelonging leafType) {
+    final String LeafBelongPath;
+    switch(leafType){
+      
+      case LeafBelonging.leafs:
+        LeafBelongPath="leafs";
+        break;
+      case LeafBelonging.recycleBin:
+        LeafBelongPath="recycleBin";
+        break;
+      case LeafBelonging.autoSave:
+        LeafBelongPath="autoSaves";
+        break;
+    }
+    return "$repoPath${Platform.pathSeparator}$LeafBelongPath${Platform.pathSeparator}${key.value}";
   }
 
   Leaf _getLastLeaf() {
@@ -111,27 +125,27 @@ class Repo {
         element.createdTime.isAfter(value.createdTime) ? element : value);
   }
 
-  retirveToLeaf(ValueKey<String> targetLeafKey) {
+  retirveToLeaf(ValueKey<String> targetLeafKey,LeafBelonging belonging) {
     //不会出现不在leafs中的key
 
     //临时leaf,创建一个现有备份，直接送入回收站
     //不能newLeaf方法,不移动标头不创建relation
-    final tempLeaf = Leaf(
+    final backUpLeaf = Leaf(
         ValueKey("${DateTime.now().millisecondsSinceEpoch}NA"),
         false,
         "发生覆盖时的备份");
-    leafRcyclBin.add(tempLeaf);
+    leafRcyclBin.add(backUpLeaf);
 
     //复制文件直接到回收站
     _copyTo(
-        "${repoPath}${Platform.pathSeparator}recycleBin${Platform.pathSeparator}${tempLeaf.leafKey.value}",
+        "$repoPath${Platform.pathSeparator}recycleBin${Platform.pathSeparator}${backUpLeaf.leafKey.value}",
         CopyDirection.target2Leaf);
 
     //覆盖到目标文件处
-    _copyTo(genLeafPath(targetLeafKey), CopyDirection.leaf2Target);
+    _copyTo(genLeafPath(targetLeafKey,belonging), CopyDirection.leaf2Target);
 
     //移动标头到回退到的leaf
-    headerLeafKey = targetLeafKey as ValueKey<String>?;
+    headerLeafKey = targetLeafKey;
 
     //写入json
     toJsonFile();
@@ -211,7 +225,7 @@ class Repo {
 
     //移动文件
 
-    String leafPath = genLeafPath(targetLeafKey);
+    String leafPath = genLeafPath(targetLeafKey,LeafBelonging.leafs);
 
     final leafDircetory = Directory(leafPath);
     final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
@@ -248,7 +262,7 @@ class Repo {
 
     //创建leaf 文件夹
 
-    Directory leafPath = Directory(genLeafPath(newLeaf.leafKey));
+    Directory leafPath = Directory(genLeafPath(newLeaf.leafKey,LeafBelonging.leafs));
 
     await leafPath.create();
 

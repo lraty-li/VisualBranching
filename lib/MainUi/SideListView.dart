@@ -54,15 +54,46 @@ class SideListView extends StatelessWidget {
 
 //todo impl ontap
 Widget _buildListView(List<Leaf> theList) {
+  Offset tapPosition;
   return ListView.builder(
     //显示节点头
     itemCount: theList.length,
     itemBuilder: (BuildContext context, int index) {
-      return ListTile(
+      return InkWell(
+        onTapDown: (details) {
+          tapPosition = details.globalPosition;
+
+          final RenderObject? overlay =
+              Overlay.of(context)?.context.findRenderObject();
+
+          showMenu(
+                  context: context,
+                  items: <PopupMenuEntry<int>>[
+                    PopupMenuItem(
+                      child: Text("回退到节点"),
+                      value: index,
+                    )
+                  ],
+
+                  //基本是右对齐
+                  position: RelativeRect.fromRect(
+                      tapPosition &
+                          const Size(1, 1), // smaller rect, the touch area
+                      Offset.zero &
+                          overlay!.semanticBounds
+                              .size // Bigger rect, the entire screen
+                      ))
+              // This is how you handle user selection
+              .then(
+            (value) => print(value),
+          );
+        },
+        child: ListTile(
           title: _buildBrefTile(theList[index].createdTime.toLocal().toString(),
               theList[index].annotation),
           //todo impl focus
-          onTap: () => {print(index)});
+        ),
+      );
     },
   );
 }
