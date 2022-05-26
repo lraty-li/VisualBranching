@@ -3,6 +3,7 @@ import 'package:graphview/GraphView.dart';
 import 'package:provider/provider.dart';
 import 'package:visual_branching/providers/MainStatus.dart';
 import 'package:visual_branching/util/common.dart';
+import 'package:visual_branching/util/funcs.dart';
 import 'package:visual_branching/util/models.dart';
 
 class CtlBtn extends StatelessWidget {
@@ -57,8 +58,13 @@ class CtlBtn extends StatelessWidget {
           text: "清空回收站",
           colorData: Colors.red,
           onTapFunc: (provider) {
-            provider.openedRepoList.first.clearRecycleBin();
-            provider.updateVoidCall();
+            final result = confirmDialog(context, "确认清空回收站？", "不会移动到系统回收站，清空后无法恢复。");
+            result.then((value) {
+              if (value == true) {
+                provider.openedRepoList.first.clearRecycleBin();
+                provider.updateVoidCall();
+              }
+            });
           })
     ]);
   }
