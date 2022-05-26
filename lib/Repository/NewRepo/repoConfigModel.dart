@@ -5,45 +5,76 @@ class RepoConfig extends ChangeNotifier {
   late bool autoSave;
   late int autoSaveInterval;
   late int autoSavesNums;
-  late List<String> targetFilePaths = [];
+  late List<String> targetFilePaths;
   bool validated = false;
 
-  _validate() {
-    if (repoName.length != 0 && targetFilePaths.length != 0)
-      validated = true;
-    else {
+  validate() {
+    if (repoName.isNotEmpty && targetFilePaths.isNotEmpty) {
+      if (autoSave) {
+        if (autoSavesNums > 0 && autoSaveInterval > 0) {
+          validated = true;
+        } else {
+          validated = false;
+        }
+      } else {
+        validated = true;
+      }
+    } else {
       validated = false;
     }
+
+    notifyListeners();
   }
 
   addTarget(String path) {
     targetFilePaths.add(path);
-    _validate();
-    notifyListeners();
+    validate();
   }
 
   delTarget(int index) {
     targetFilePaths.removeAt(index);
-    _validate();
-    notifyListeners();
+    validate();
   }
 
   clearAllTarget() {
     targetFilePaths.clear();
-    _validate();
-    notifyListeners();
+    validate();
   }
+
 
   setRepoName(String newRepoName) {
     repoName = newRepoName;
-    _validate();
-    notifyListeners();
+    validate();
+  }
+
+  setIfAutoSave(bool value) {
+    autoSave = value;
+    validate();
+  }
+  setAutoSaveIntervel(int value) {
+    autoSaveInterval=value;
+    validate();
+  }
+
+  setAutoSaveNums(int value) {
+    autoSavesNums=value;
+    validate();
+  }
+
+  static fromConfig(RepoConfig oldConfig) {
+    return RepoConfig(
+        repoName: oldConfig.repoName,
+        autoSave: oldConfig.autoSave,
+        autoSaveInterval: oldConfig.autoSaveInterval,
+        autoSavesNums: oldConfig.autoSavesNums,
+        targetFilePaths: []);
   }
 
   RepoConfig({
     this.repoName = "",
     this.autoSave = false,
-    this.autoSaveInterval = -1,
-    this.autoSavesNums = -1,
+    this.autoSaveInterval = 60,
+    this.autoSavesNums = 40,
+    required this.targetFilePaths,
   });
 }

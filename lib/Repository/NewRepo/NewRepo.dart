@@ -15,7 +15,7 @@ void newRepoDialog(BuildContext context) {
       context: context,
       builder: (context) {
         return ChangeNotifierProvider(
-            create: (context) => RepoConfig(),
+            create: (context) => RepoConfig(targetFilePaths: []),
             child: AlertDialog(
                 title: Text("新建库"),
                 actions: <Widget>[
@@ -26,7 +26,6 @@ void newRepoDialog(BuildContext context) {
                             ? () async {
                                 // Navigator.of(context).pop();
 
-                                inspect(repoConfig);
 
                                 //创建repo对象
                                 Repo theCreatorRepo = await Repo.newRepo(
