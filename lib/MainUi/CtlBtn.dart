@@ -48,6 +48,7 @@ class CtlBtn extends StatelessWidget {
             } else {
               provider.openedRepoList.first
                   .retirveToLeaf(ValueKey(tempOldheaderId));
+              provider.updateVoidCall();
             }
           }),
     ]);

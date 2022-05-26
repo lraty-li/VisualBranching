@@ -20,11 +20,12 @@ class SideListView extends StatelessWidget {
         length: isAutoSave ? 3 : 2,
         child: Scaffold(
           appBar: PreferredSize(
-            //72 or 46? check define of [Tab]
+            //todo 72 or 46? check define of [Tab]
             //2 of default border?
             preferredSize: Size.fromHeight(48),
             child: AppBar(
               bottom: TabBar(
+                isScrollable: true,
                 tabs: [
                   Tab(text: '分支'),
                   Tab(text: '回收站'),
