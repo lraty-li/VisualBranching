@@ -19,7 +19,7 @@ class MainStatus extends ChangeNotifier {
     notifyListeners();
   }
 
-  removeByKey(ValueKey targetRepoKey) {
+  removeOpenedByKey(ValueKey targetRepoKey) {
     openedRepoList.remove(openedRepoList
         .firstWhere((element) => element.repoKey == targetRepoKey));
         //todo 删除对应graph

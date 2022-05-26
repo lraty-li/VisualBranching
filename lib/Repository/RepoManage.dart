@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:visual_branching/Repository/NewRepo/repoConfigModel.dart';
 import 'package:visual_branching/Repository/NewRepo/repoOptions.dart';
 import 'package:visual_branching/Repository/ReposList.dart';
+import 'package:visual_branching/providers/MainStatus.dart';
 import 'package:visual_branching/util/models.dart';
 
 void repoManagDialog(BuildContext context) {
@@ -70,7 +71,13 @@ void repoManagDialog(BuildContext context) {
                                         MaterialStateProperty.all(Colors.red)),
                                 onPressed: () {
                                   //todo impl
-                                  // Navigator.of(context).pop();
+                                  //todo 关闭已打开 ()
+                                  Provider.of<MainStatus>(context,
+                                          listen: false)
+                                      .removeAllOpenedRepo();
+
+                                  Repo.delRepo(repo);
+                                  Navigator.of(context).pop();
                                 },
                                 child: Text("删除库"),
                               ),

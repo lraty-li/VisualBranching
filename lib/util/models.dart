@@ -41,45 +41,20 @@ class Repo {
 
   Map<ValueKey<String>, List<ValueKey<String>>> realtions;
 
-  String genLeafPath(ValueKey<String> key) {
-    return "$repoPath${Platform.pathSeparator}leafs${Platform.pathSeparator}${key.value}";
-  }
+  static delRepo(Repo repo) {
+    //todo 停止自动保存
 
-  static String _genLeafName(int nowUnixEpoch, NodeType nodeType) {
-    switch (nodeType) {
-      case NodeType.manually:
-        return nowUnixEpoch.toString() + "N" + "M";
-      case NodeType.automatically:
-        return nowUnixEpoch.toString() + "N" + "A";
+    try {
+      //直接删除repo文件夹
+      Directory(repo.repoPath).deleteSync(recursive: true);
+    } on FileSystemException catch (e) {
+      //文件夹删除
+      print(e);
     }
   }
 
-  static bool _genCanEdit(NodeType nodeType) {
-    switch (nodeType) {
-      case NodeType.manually:
-        return true;
-      case NodeType.automatically:
-        return false;
-    }
-  }
-
-  static bool _loadCanEdit(String leafIdName) {
-    String lastChar = leafIdName.substring(leafIdName.length - 2);
-    switch (lastChar) {
-      case "M":
-        return true;
-      case "A":
-        return false;
-
-      default:
-        {
-          return false;
-        }
-    }
-  }
-
-  static int _parseStamp(String leafIdName) {
-    return int.parse(leafIdName.substring(0, leafIdName.length - 2));
+  static runAutoSave() {
+    //todo impl
   }
 
   _copyTo(String filePath, CopyDirection direction) {
@@ -122,8 +97,8 @@ class Repo {
     }
   }
 
-  static runAutoSave() {
-    //todo impl
+  String genLeafPath(ValueKey<String> key) {
+    return "$repoPath${Platform.pathSeparator}leafs${Platform.pathSeparator}${key.value}";
   }
 
   Leaf _getLastLeaf() {
@@ -331,6 +306,43 @@ class Repo {
     jsonFile.writeAsStringSync(json.encode(repoMap));
   }
 
+  static String _genLeafName(int nowUnixEpoch, NodeType nodeType) {
+    switch (nodeType) {
+      case NodeType.manually:
+        return nowUnixEpoch.toString() + "N" + "M";
+      case NodeType.automatically:
+        return nowUnixEpoch.toString() + "N" + "A";
+    }
+  }
+
+  static bool _genCanEdit(NodeType nodeType) {
+    switch (nodeType) {
+      case NodeType.manually:
+        return true;
+      case NodeType.automatically:
+        return false;
+    }
+  }
+
+  static bool _loadCanEdit(String leafIdName) {
+    String lastChar = leafIdName.substring(leafIdName.length - 2);
+    switch (lastChar) {
+      case "M":
+        return true;
+      case "A":
+        return false;
+
+      default:
+        {
+          return false;
+        }
+    }
+  }
+
+  static int _parseStamp(String leafIdName) {
+    return int.parse(leafIdName.substring(0, leafIdName.length - 2));
+  }
+
   static Future<Repo> newRepo(
     String repoName,
     bool autoSave,
@@ -487,15 +499,6 @@ class Leaf {
   MapEntry<String, String> toMapEntry() {
     return MapEntry(leafKey.value, annotation);
   }
-  // static Leaf loadLeaf(
-  //     String leafName, String leafFilePath, String leafAnnotation) {
-  //   return Leaf(
-  //       ValueKey(leafName),
-  //       DateTime.parse(leafName.split("N")[0]),
-  //       //todo 风险
-  //       leafName.endsWith("M"),
-  //       leafAnnotation);
-  // }
 
   Leaf(this.leafKey, this.canEdit, this.annotation) {
     if (leafKey.value.isEmpty) {
