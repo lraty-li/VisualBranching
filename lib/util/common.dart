@@ -25,3 +25,9 @@ enum CopyDirection {
   recycle2Leafs,
   autoSave2Leafs
 }
+
+enum SideList{
+  headOfBranch,
+  recycleBin,
+  autoSave,
+}

@@ -38,12 +38,13 @@ class SideListView extends StatelessWidget {
           body: TabBarView(
             children: [
               //显示节点头
-              _buildListView(rootLeafs, (index) {
-                print(index);
+              _buildListView(SideList.headOfBranch, rootLeafs, (index) {
+                provider.focusToNode(rootLeafs[index].leafKey);
               }),
 
               //显示回收站
-              _buildListView(targetRepo.leafRcyclBin, (index) {
+              _buildListView(SideList.recycleBin, targetRepo.leafRcyclBin,
+                  (index) {
                 //不复制， 移动leaf ,
                 //todo 是否修改备注？
                 targetRepo.leafRcyclBin[index].annotation =
@@ -54,7 +55,8 @@ class SideListView extends StatelessWidget {
               }),
               //显示自动保存
               if (isAutoSave)
-                _buildListView(targetRepo.autoSaves, (index) {
+                _buildListView(SideList.recycleBin, targetRepo.autoSaves,
+                    (index) {
                   //todo copy the leaf
                   targetRepo.retirveToLeaf(
                       targetRepo.autoSaves[index].leafKey, LeafFrom.autoSave);
@@ -68,11 +70,12 @@ class SideListView extends StatelessWidget {
 }
 
 //todo impl ontap
-Widget _buildListView(
-    List<Leaf> theList, void Function(int leafIndex) onTapfunc) {
+Widget _buildListView(SideList tapFrom, List<Leaf> theList,
+    void Function(int leafIndex) onTapfunc) {
   Offset tapPosition;
   return ListView.builder(
     //显示节点头
+    
     itemCount: theList.length,
     itemBuilder: (BuildContext context, int index) {
       return InkWell(
@@ -82,31 +85,43 @@ Widget _buildListView(
           final RenderObject? overlay =
               Overlay.of(context)?.context.findRenderObject();
 
-          showMenu(
-                  context: context,
-                  items: <PopupMenuEntry<int>>[
-                    PopupMenuItem(
-                      child: Text("回退到节点"),
-                      value: index,
-                    )
-                  ],
-
-                  //基本是右对齐
-                  position: RelativeRect.fromRect(
-                      tapPosition &
-                          const Size(1, 1), // smaller rect, the touch area
-                      Offset.zero &
-                          overlay!.semanticBounds
-                              .size // Bigger rect, the entire screen
-                      ))
-              // This is how you handle user selection
-              .then(
-            (value) {
-              if (value != null) {
-                onTapfunc(value);
+          switch (tapFrom) {
+            case SideList.headOfBranch:
+              {
+                onTapfunc(index);
+                break;
               }
-            },
-          );
+            default:
+              // case SideList.recycleBin:
+              // case SideList.autoSave:
+              {
+                showMenu(
+                        context: context,
+                        items: <PopupMenuEntry<int>>[
+                          PopupMenuItem(
+                            child: Text("回退到节点"),
+                            value: index,
+                          )
+                        ],
+
+                        //基本是右对齐
+                        position: RelativeRect.fromRect(
+                            tapPosition &
+                                const Size(
+                                    1, 1), // smaller rect, the touch area
+                            Offset.zero &
+                                overlay!.semanticBounds
+                                    .size // Bigger rect, the entire screen
+                            ))
+                    .then(
+                  (value) {
+                    if (value != null) {
+                      onTapfunc(value);
+                    }
+                  },
+                );
+              }
+          }
         },
         child: ListTile(
           title: _buildBrefTile(theList[index].createdTime.toLocal().toString(),
