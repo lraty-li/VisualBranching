@@ -34,7 +34,9 @@ class CtlBtn extends StatelessWidget {
                       .getNodeUsingId(provider.openedRepoList.first.repoName),
                   Node.Id(newLeaf.leafKey.value));
             }
-
+            provider.focusToNode(ValueKey(
+                provider.openedRepoList.first.headerLeafKey?.value ??
+                    provider.openedRepoList.first.repoName));
             provider.updateVoidCall();
           });
         },
@@ -50,7 +52,8 @@ class CtlBtn extends StatelessWidget {
 
             } else {
               provider.openedRepoList.first
-                  .retirveToLeaf(ValueKey(tempOldheaderId),LeafFrom.leafs);
+                  .retirveToLeaf(ValueKey(tempOldheaderId), LeafFrom.leafs);
+              provider.focusToNode(ValueKey(tempOldheaderId));
               provider.updateVoidCall();
             }
           }),
@@ -58,7 +61,8 @@ class CtlBtn extends StatelessWidget {
           text: "清空回收站",
           colorData: Colors.red,
           onTapFunc: (provider) {
-            final result = confirmDialog(context, "确认清空回收站？", "不会移动到系统回收站，清空后无法恢复。");
+            final result =
+                confirmDialog(context, "确认清空回收站？", "不会移动到系统回收站，清空后无法恢复。");
             result.then((value) {
               if (value == true) {
                 provider.openedRepoList.first.clearRecycleBin();

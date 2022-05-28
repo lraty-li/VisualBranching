@@ -614,6 +614,8 @@ class Repo {
 class Leaf {
   //通过leaf名字字符串生成
   //leaf名称 前缀为创建时间的utc Linux时间戳
+
+  //todo 新增ID name？ 避免频繁leafKey.value
   late ValueKey<String> leafKey;
 
   //由leaf名字 字符串最后一个字母决定，M手动管理，A自动管理

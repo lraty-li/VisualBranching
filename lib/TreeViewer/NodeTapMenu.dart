@@ -6,6 +6,7 @@ import 'package:visual_branching/util/common.dart';
 import 'dart:io';
 
 import 'package:visual_branching/util/funcs.dart';
+import 'package:visual_branching/util/models.dart';
 
 void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
   if (!Provider.of<MainStatus>(context, listen: false)
@@ -30,7 +31,11 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                   Provider.of<MainStatus>(context, listen: false)
                       .openedRepoList
                       .first
-                      .retirveToLeaf(nodeKey,LeafFrom.leafs);
+                      .retirveToLeaf(nodeKey, LeafFrom.leafs);
+                  Provider.of<MainStatus>(context, listen: false)
+
+                      //todo 已有nodeKey
+                      .focusToNode(ValueKey(nodeKey.value));
                   Provider.of<MainStatus>(context, listen: false)
                       .updateVoidCall();
 
@@ -51,10 +56,13 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                   Provider.of<MainStatus>(context, listen: false)
                       .openedRepoList
                       .first
-                      .newLeaf(NodeType.manually, targetLeaf.annotation, true);
-
-                  Provider.of<MainStatus>(context, listen: false)
-                      .updateVoidCall();
+                      .newLeaf(NodeType.manually, targetLeaf.annotation, true)
+                      .then((newLeaf) {
+                    Provider.of<MainStatus>(context, listen: false)
+                        .focusToNode(ValueKey(newLeaf.leafKey.value));
+                    Provider.of<MainStatus>(context, listen: false)
+                        .updateVoidCall();
+                  });
 
                   Navigator.of(context).pop();
                 })),
@@ -65,7 +73,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                       Provider.of<MainStatus>(context, listen: false)
                           .openedRepoList
                           .first
-                          .genLeafPath(nodeKey,LeafFrom.leafs),
+                          .genLeafPath(nodeKey, LeafFrom.leafs),
                       windows: true);
                   //todo 出错控制
                   if (!await launchUrl(path)) throw 'Could not launch $path';

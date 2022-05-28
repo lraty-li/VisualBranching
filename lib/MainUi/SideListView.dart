@@ -51,6 +51,9 @@ class SideListView extends StatelessWidget {
                     "由回收站还原:${targetRepo.leafRcyclBin[index].annotation}";
                 targetRepo.retirveToLeaf(targetRepo.leafRcyclBin[index].leafKey,
                     LeafFrom.recycleBin);
+                //todo 除了聚焦标头，其他都是聚焦到header。
+                provider.focusToNode(
+                    ValueKey(targetRepo.leafRcyclBin[index].leafKey.value));
                 provider.updateVoidCall();
               }),
               //显示自动保存
@@ -75,7 +78,7 @@ Widget _buildListView(SideList tapFrom, List<Leaf> theList,
   Offset tapPosition;
   return ListView.builder(
     //显示节点头
-    
+
     itemCount: theList.length,
     itemBuilder: (BuildContext context, int index) {
       return InkWell(
