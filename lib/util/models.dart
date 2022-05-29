@@ -22,9 +22,6 @@ class Repo {
   //自动保存 的 备份 保有个数
   int autoSaveNum;
 
-//repo 路径，但是不会存入json，仅用于运行时访问
-  String repoPath;
-
 //标头节点key
 //标头表示最接近真实目标文件状态的版本（节点）?
   ValueKey<String>? headerLeafKey;
@@ -36,8 +33,10 @@ class Repo {
   List<Leaf> leafRcyclBin;
 
   //auto Saves
-  //todo 取消canEdit？
   List<Leaf> autoSaves;
+
+  ///these properties will not be writed to json
+  String repoPath;
 
   Map<ValueKey<String>, List<ValueKey<String>>> realtions;
 
@@ -210,13 +209,11 @@ class Repo {
   retirveToLeaf(ValueKey<String> targetLeafKey, LeafFrom belonging) {
     //targetLeafKey可能来源 回收站/自动保存/leafs
 
-    //todo 新增移动leaf 方法？
     switch (belonging) {
       case LeafFrom.leafs:
         break;
       case LeafFrom.recycleBin:
         {
-          //todo 是否修改备注？
           final targetLeaf = getLeafByKey(targetLeafKey, LeafFrom.recycleBin);
           targetLeaf.annotation = "由回收站还原:${targetLeaf.annotation}";
           leafs.add(targetLeaf);
@@ -242,9 +239,7 @@ class Repo {
     //不能newLeaf方法,不移动标头不创建relation
 
     final backUpLeaf = Leaf(
-        ValueKey("${DateTime.now().millisecondsSinceEpoch}NA"),
-        false,
-        "发生覆盖时的备份");
+        ValueKey("${DateTime.now().millisecondsSinceEpoch}NA"), "发生覆盖时的备份");
     leafRcyclBin.add(backUpLeaf);
 
     //复制文件直接到回收站
@@ -291,7 +286,7 @@ class Repo {
         //只有目标一个节点（已被移除）
         headerLeafKey = null;
       } else {
-        // todo 当移除某个分支上的唯一节点（没有父子）
+        // 当移除某个分支上的唯一节点（没有父子）
 
         //删除的是某个分支的唯一节点，不动标头
 
@@ -369,8 +364,7 @@ class Repo {
 
     String newLeafName = _genLeafName(nowUnixEpoch, nodeType);
 
-    Leaf newLeaf =
-        Leaf(ValueKey(newLeafName), _genCanEdit(nodeType), leafAnnotation);
+    Leaf newLeaf = Leaf(ValueKey(newLeafName), leafAnnotation);
 
     //创建leaf 文件夹
 
@@ -453,30 +447,6 @@ class Repo {
     }
   }
 
-  static bool _genCanEdit(NodeType nodeType) {
-    switch (nodeType) {
-      case NodeType.manually:
-        return true;
-      case NodeType.automatically:
-        return false;
-    }
-  }
-
-  static bool _loadCanEdit(String leafIdName) {
-    String lastChar = leafIdName.substring(leafIdName.length - 2);
-    switch (lastChar) {
-      case "M":
-        return true;
-      case "A":
-        return false;
-
-      default:
-        {
-          return false;
-        }
-    }
-  }
-
   static int _parseStamp(String leafIdName) {
     return int.parse(leafIdName.substring(0, leafIdName.length - 2));
   }
@@ -504,20 +474,20 @@ class Repo {
     await recycleBinPath.create(recursive: true);
 
     //创建自动保存文件夹
+    //直接创建，即使配置没有开启
     Directory autoSavePath =
         Directory("$repoPath${Platform.pathSeparator}autoSaves");
 
     Directory leafsPath = Directory("$repoPath${Platform.pathSeparator}leafs");
 
-    await recycleBinPath.create(recursive: true);
-    await autoSavePath.create(recursive: true);
-    await leafsPath.create(recursive: true);
+    autoSavePath.create(recursive: true);
+    leafsPath.create(recursive: true);
 
     //生成对照表
     Map<String, String> newComparsionTab = {};
     for (String element in targetFilePaths) {
       List<String> splitd = element.split(Platform.pathSeparator);
-      //todo 风险？
+      //Windows下最短:目标文件在C盘根， C:/targetFile
       newComparsionTab[splitd[splitd.length - 2] + splitd.last] = element;
     }
 
@@ -532,11 +502,13 @@ class Repo {
         null, [], [], [], [], {});
   }
 
-  static fromJson(String jsonFilePath) {
+  static Future<Repo> fromJson(String jsonFilePath) async {
     //从json文件读取库
     File jsonFile = File(jsonFilePath);
     //todo异步
-    Map<String, dynamic> repoJsonObj = json.decode(jsonFile.readAsStringSync());
+    final jsonString = await jsonFile.readAsString();
+
+    Map<String, dynamic> repoJsonObj = json.decode(jsonString);
     //todo 错误检测
 
     //leafIdName , annotation
@@ -544,8 +516,7 @@ class Repo {
 
     List<Leaf> leafList = [];
     tempMap.forEach((leafIdName, annotation) {
-      leafList.add(
-          Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
+      leafList.add(Leaf(ValueKey(leafIdName), annotation));
     });
 
 //parse recycle bin
@@ -553,8 +524,7 @@ class Repo {
 
     List<Leaf> leafRcyclBin = [];
     tempMap.forEach((leafIdName, annotation) {
-      leafRcyclBin.add(
-          Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
+      leafRcyclBin.add(Leaf(ValueKey(leafIdName), annotation));
     });
 
 //parse autoSaves
@@ -562,8 +532,7 @@ class Repo {
 
     List<Leaf> autoSaves = [];
     tempMap.forEach((leafIdName, annotation) {
-      autoSaves.add(
-          Leaf(ValueKey(leafIdName), _loadCanEdit(leafIdName), annotation));
+      autoSaves.add(Leaf(ValueKey(leafIdName), annotation));
     });
 
     String? headerLeafIdName = repoJsonObj["headerLeaf"];
@@ -625,11 +594,9 @@ class Leaf {
   //通过leaf名字字符串生成
   //leaf名称 前缀为创建时间的utc Linux时间戳
 
-  //todo 新增ID name？ 避免频繁leafKey.value
   late ValueKey<String> leafKey;
 
   //由leaf名字 字符串最后一个字母决定，M手动管理，A自动管理
-  late bool canEdit;
 
   late DateTime createdTime;
 
@@ -640,9 +607,9 @@ class Leaf {
     return MapEntry(leafKey.value, annotation);
   }
 
-  Leaf(this.leafKey, this.canEdit, this.annotation) {
+  Leaf(this.leafKey, this.annotation) {
     if (leafKey.value.isEmpty) {
-      //todo 时区问题?
+      //当创建graph基底节点，传入 [Leaf(const ValueKey(""), "")]
       createdTime = DateTime.now();
       return;
     } else {

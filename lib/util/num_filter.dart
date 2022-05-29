@@ -25,7 +25,7 @@ class NumericalRangeFormatter extends TextInputFormatter {
     }
     int newValueInt = int.parse(newValue.text);
     if (newValueInt > max) {
-      //todo 类型检查？
+      //TODO: 类型检查？
       errTxtWarp.value = "$errTxtTemplate : $max";
       TextEditingValue tempValue = TextEditingValue(
           selection: TextSelection.fromPosition(TextPosition(

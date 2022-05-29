@@ -70,7 +70,6 @@ Widget _fakeTreeWindow() {
     children: [
       //未开启任何repo时
 
-      //todo 点击打开repo？
       Expanded(flex: 5, child: Container()),
       Expanded(
           flex: 1,

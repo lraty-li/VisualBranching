@@ -68,28 +68,18 @@ Future<bool?> confirmDialog(
       });
 }
 
-Future<String?> reposShower(BuildContext context, String key,
-    List<ValueKey> repoKeys, VoidCallback ontap) {
-  return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-            title: const Text("选择库"),
-            content: SizedBox(
-              height: 300.0, // Change as per your requirement
-              width: 300.0, // Change as per your requirement
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: repoKeys.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return ListTile(
-                    //todo 根据valuekey 查找 库名称
-                    title: const Text('根据valuekey 查找 库名称'),
-                    onTap: ontap,
-                    //todo pop chosen tile
-                  );
-                },
-              ),
-            ));
-      });
-}
+showLoadingDialog(BuildContext context){
+    AlertDialog alert=AlertDialog(
+      content: Row(
+        children: const [
+          CircularProgressIndicator(),
+          // Container(margin: EdgeInsets.only(left: 7),child:Text("Loading..." )),
+        ],),
+    );
+    showDialog(barrierDismissible: false,
+      context:context,
+      builder:(BuildContext context){
+        return alert;
+      },
+    );
+  }

@@ -58,13 +58,13 @@ class _NodeWidgetState extends State<NodeWidget> {
               //todo repoName 节点的信息冗余（去掉orElse？
               Text(provider.openedRepoList.first.leafs
                   .firstWhere((element) => element.leafKey == widget.leafkey,
-                      orElse: () => Leaf(const ValueKey(""), false, ""))
+                      orElse: () => Leaf(const ValueKey(""), ""))
                   .createdTime
                   .toString()),
               //当创建repo 名字的node时，会转入orElse
               Text(provider.openedRepoList.first.leafs
                   .firstWhere((element) => element.leafKey == widget.leafkey,
-                      orElse: () => Leaf(const ValueKey(""), false, ""))
+                      orElse: () => Leaf(const ValueKey(""), ""))
                   .annotation)
             ]),
           ),
