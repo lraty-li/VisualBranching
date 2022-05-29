@@ -1,13 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/MainUi/SideListView.dart';
-import 'package:visual_branching/TreeViewer/View.dart';
-import 'package:visual_branching/providers/MainStatus.dart';
-import 'MainUi/CtlBtn.dart';
-import 'MainUi/WindowTitleBar.dart';
+import 'package:visual_branching/MainUi/side_list_view.dart';
+import 'package:visual_branching/TreeViewer/view.dart';
+import 'package:visual_branching/providers/main_status.dart';
+import 'MainUi/ctl_btn.dart';
+import 'MainUi/window_title_bar.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:visual_branching/Repository/RepositoryMenu.dart';
 
 const borderColor = Color(0xFF805306);
 

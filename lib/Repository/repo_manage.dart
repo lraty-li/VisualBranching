@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/Repository/NewRepo/repoConfigModel.dart';
-import 'package:visual_branching/Repository/NewRepo/repoOptions.dart';
-import 'package:visual_branching/Repository/ReposList.dart';
-import 'package:visual_branching/providers/MainStatus.dart';
+import 'package:visual_branching/Repository/NewRepo/repo_config_model.dart';
+import 'package:visual_branching/Repository/NewRepo/repo_options.dart';
+import 'package:visual_branching/Repository/repos_list.dart';
+import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/models.dart';
 
 void repoManagDialog(BuildContext context) {
@@ -13,7 +13,7 @@ void repoManagDialog(BuildContext context) {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("库管理"),
+          title: const Text("库管理"),
           content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.5,
             height: MediaQuery.of(context).size.height * 0.6,
@@ -35,8 +35,6 @@ void repoManagDialog(BuildContext context) {
                             actions: <Widget>[
                               Consumer<RepoConfig>(
                                 builder: (context, repoConfig, child) {
-                                  print(
-                                      "buttom rebuilded ${repoConfig.validated}");
                                   return ElevatedButton(
                                     onPressed: repoConfig.validated
                                         ? () async {
@@ -51,7 +49,7 @@ void repoManagDialog(BuildContext context) {
                                             Navigator.of(context).pop();
                                           }
                                         : null,
-                                    child: Text("确认修改"),
+                                    child: const Text("确认修改"),
                                   );
                                 },
                               ),
@@ -59,7 +57,7 @@ void repoManagDialog(BuildContext context) {
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
-                                child: Text("取消"),
+                                child: const Text("取消"),
                               ),
                               ElevatedButton(
                                 style: ButtonStyle(
@@ -75,7 +73,7 @@ void repoManagDialog(BuildContext context) {
                                   Repo.delRepo(repo);
                                   Navigator.of(context).pop();
                                 },
-                                child: Text("删除库"),
+                                child: const Text("删除库"),
                               ),
                             ],
                             content: SizedBox(
@@ -95,7 +93,7 @@ void repoManagDialog(BuildContext context) {
                                     child: Flex(
                                       direction: Axis.vertical,
                                       children: [
-                                        Text("已选择文件（不可修改)"),
+                                        const Text("已选择文件（不可修改)"),
 
                                         Expanded(
                                             child: ListView.builder(

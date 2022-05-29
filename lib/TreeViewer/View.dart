@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/providers/MainStatus.dart';
+import 'package:visual_branching/TreeViewer/node_widget.dart';
+import 'package:visual_branching/providers/main_status.dart';
 import 'package:vector_math/vector_math_64.dart' as vector_math_64;
-import 'NodeWidget.dart';
 
 class TreeView extends StatefulWidget {
   const TreeView({Key? key}) : super(key: key);
@@ -79,9 +79,9 @@ class _TreeViewState extends State<TreeView> with TickerProviderStateMixin {
       });
 
       //将根节点（roots）绑到 defaultNode
-      repo.rootLeafKeys.forEach((rootLeaf) {
+      for (var rootLeaf in repo.rootLeafKeys) {
         graph.addEdge(currBaseNode, Node.Id(rootLeaf.value));
-      });
+      }
     } else {
       //todo no leaf?
 

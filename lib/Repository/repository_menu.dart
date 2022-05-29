@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:visual_branching/Repository/NewRepo/NewRepo.dart';
-import 'package:visual_branching/Repository/OepnRepo.dart';
-import 'package:visual_branching/Repository/RepoManage.dart';
+import 'package:visual_branching/Repository/NewRepo/new_repo.dart';
+import 'package:visual_branching/Repository/oepn_repo.dart';
+import 'package:visual_branching/Repository/repo_manage.dart';
 import 'package:visual_branching/util/common.dart';
 
 Widget repoMenuBuilder(BuildContext context) {
   return PopupMenuButton<RepoManagOpt>(
-    icon: Text("库"),
+    icon: const Text("库"),
     //todo ? kToolbarHeight
-    offset: Offset(0, kToolbarHeight / 2),
+    offset: const Offset(0, kToolbarHeight / 2),
     onSelected: (RepoManagOpt result) {
       _runOption(context, result);
     },

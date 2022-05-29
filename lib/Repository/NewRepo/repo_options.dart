@@ -1,14 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:visual_branching/Repository/NewRepo/repoConfigModel.dart';
-import 'package:visual_branching/util/classWraper.dart';
-import 'package:visual_branching/util/numFilter.dart';
+import 'package:visual_branching/Repository/NewRepo/repo_config_model.dart';
+import 'package:visual_branching/util/class_wraper.dart';
+import 'package:visual_branching/util/num_filter.dart';
 
 class RepoOptions extends StatefulWidget {
   final RepoConfig configHandle;
-  const RepoOptions({Key? key, required RepoConfig this.configHandle})
-      : super(key: key);
+  const RepoOptions({Key? key, required this.configHandle}) : super(key: key);
 
   @override
   State<RepoOptions> createState() => RRepoOptionsState();
@@ -22,9 +19,7 @@ class RRepoOptionsState extends State<RepoOptions> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    inspect(widget.configHandle);
   }
 
   @override
@@ -42,7 +37,7 @@ class RRepoOptionsState extends State<RepoOptions> {
                 errorText: _nameErrorText.value)),
         Row(
           children: [
-            Text("开启自动保存"),
+            const Text("开启自动保存"),
 
             // Builder(
             //   builder: (BuildContext context) {
@@ -86,7 +81,7 @@ class RRepoOptionsState extends State<RepoOptions> {
           keyboardType: TextInputType.number,
           onChanged: (value) {
             if (value.isNotEmpty) {
-              widget.configHandle..setAutoSaveNums(int.parse(value));
+              widget.configHandle.setAutoSaveNums(int.parse(value));
             }
           },
           decoration: InputDecoration(

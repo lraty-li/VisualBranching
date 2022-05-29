@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/TreeViewer/NodeTapMenu.dart';
-import 'package:visual_branching/providers/MainStatus.dart';
-import 'package:visual_branching/util/funcs.dart';
+import 'package:visual_branching/TreeViewer/node_tap_menu.dart';
+import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/models.dart';
 
 //todo 改位staless？
 class NodeWidget extends StatefulWidget {
   final ValueKey<String> leafkey;
-  const NodeWidget({Key? key, required ValueKey<String> this.leafkey})
-      : super(key: key);
+  const NodeWidget({Key? key, required this.leafkey}) : super(key: key);
 
   @override
   State<NodeWidget> createState() => _NodeWidgetState();
@@ -19,8 +17,6 @@ class _NodeWidgetState extends State<NodeWidget> {
   //todo seleted list contains
   @override
   void initState() {
-    // TODO: implement initState
-    // print("nodeWidget init ${widget.data.nodeId}");
     super.initState();
   }
 

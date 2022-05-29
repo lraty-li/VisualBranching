@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/providers/MainStatus.dart';
+import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/models.dart';
 
@@ -23,14 +23,14 @@ class SideListView extends StatelessWidget {
           appBar: PreferredSize(
             //todo 72 or 46? check define of [Tab]
             //2 of default border?
-            preferredSize: Size.fromHeight(48),
+            preferredSize: const Size.fromHeight(48),
             child: AppBar(
               bottom: TabBar(
                 isScrollable: true,
                 tabs: [
-                  Tab(text: '分支'),
-                  Tab(text: '回收站'),
-                  if (isAutoSave) Tab(text: '自动保存'),
+                  const Tab(text: '分支'),
+                  const Tab(text: '回收站'),
+                  if (isAutoSave) const Tab(text: '自动保存'),
                 ],
               ),
             ),
@@ -46,14 +46,15 @@ class SideListView extends StatelessWidget {
               _buildListView(SideList.recycleBin, targetRepo.leafRcyclBin,
                   (index) {
                 //不复制， 移动leaf ,
-                //todo 是否修改备注？
-                targetRepo.leafRcyclBin[index].annotation =
-                    "由回收站还原:${targetRepo.leafRcyclBin[index].annotation}";
-                targetRepo.retirveToLeaf(targetRepo.leafRcyclBin[index].leafKey,
-                    LeafFrom.recycleBin);
+
+                final targetLeaf = targetRepo.leafRcyclBin[index];
+
+                targetRepo.retirveToLeaf(
+                    targetLeaf.leafKey, LeafFrom.recycleBin);
+
                 //todo 除了聚焦标头，其他都是聚焦到header。
-                provider.focusToNode(
-                    ValueKey(targetRepo.leafRcyclBin[index].leafKey.value));
+                //在retriveTo 中，leaf已经从recycleBin中移到leafs
+                provider.focusToNode(ValueKey(targetLeaf.leafKey.value));
                 provider.updateVoidCall();
               }),
               //显示自动保存
@@ -102,8 +103,8 @@ Widget _buildListView(SideList tapFrom, List<Leaf> theList,
                         context: context,
                         items: <PopupMenuEntry<int>>[
                           PopupMenuItem(
-                            child: Text("回退到节点"),
                             value: index,
+                            child: const Text("回退到节点"),
                           )
                         ],
 

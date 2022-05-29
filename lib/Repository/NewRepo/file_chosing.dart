@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:visual_branching/Repository/NewRepo/repoConfigModel.dart';
+import 'package:visual_branching/Repository/NewRepo/repo_config_model.dart';
 
 // List<XFile> chosenFileList = [];
 
@@ -85,11 +85,7 @@ class _FileChosingState extends State<FileChosing> {
                             .split(Platform.pathSeparator);
                         return ListTile(
                           title: Text(
-                            "......" +
-                                Platform.pathSeparator +
-                                splitedStr[splitedStr.length - 2] +
-                                Platform.pathSeparator +
-                                splitedStr.last,
+                            "......${Platform.pathSeparator}${splitedStr[splitedStr.length - 2]}${Platform.pathSeparator}${splitedStr.last}",
                             maxLines: 1,
                             overflow: TextOverflow.clip,
                             softWrap: false,
@@ -136,14 +132,14 @@ class _FileChosingState extends State<FileChosing> {
                   // User canceled the picker
                 }
               },
-              child: Text("选择...")),
+              child: const Text("选择...")),
           ElevatedButton(
               onPressed: () => {
                     setState(() {
                       widget.configHandle.clearAllTarget();
                     })
                   },
-              child: Text("清空选择"))
+              child: const Text("清空选择"))
         ],
       )
     ]);

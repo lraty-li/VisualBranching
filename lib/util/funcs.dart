@@ -16,13 +16,13 @@ Future<String?> strDialog(BuildContext context, String title, annotation) {
               onPressed: () {
                 Navigator.of(context).pop(myController.text);
               },
-              child: Text("确认"),
+              child: const Text("确认"),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("取消"),
+              child: const Text("取消"),
             ),
           ],
         );
@@ -34,9 +34,9 @@ Future<int?> choseDialog(BuildContext context) {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: Text("选择"),
+          title: const Text("选择"),
           children: [
-            SimpleDialogOption(onPressed: (() => {print("Line35")}))
+            SimpleDialogOption(onPressed: (() => {}))
           ],
         );
       });
@@ -55,13 +55,13 @@ Future<bool?> confirmDialog(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text("确认"),
+              child: const Text("确认"),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text("取消"),
+              child: const Text("取消"),
             ),
           ],
         );
@@ -74,8 +74,8 @@ Future<String?> reposShower(BuildContext context, String key,
       context: context,
       builder: (context) {
         return AlertDialog(
-            title: Text("选择库"),
-            content: Container(
+            title: const Text("选择库"),
+            content: SizedBox(
               height: 300.0, // Change as per your requirement
               width: 300.0, // Change as per your requirement
               child: ListView.builder(
@@ -84,7 +84,7 @@ Future<String?> reposShower(BuildContext context, String key,
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
                     //todo 根据valuekey 查找 库名称
-                    title: Text('根据valuekey 查找 库名称'),
+                    title: const Text('根据valuekey 查找 库名称'),
                     onTap: ontap,
                     //todo pop chosen tile
                   );

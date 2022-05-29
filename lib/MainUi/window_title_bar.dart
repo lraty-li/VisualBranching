@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:visual_branching/Repository/RepositoryMenu.dart';
+import 'package:visual_branching/Repository/repository_menu.dart';
 
 class WindowTitleBar extends StatelessWidget {
   final BuildContext pContext;
@@ -12,7 +12,7 @@ class WindowTitleBar extends StatelessWidget {
       child: Row(
         children: [
           repoMenuBuilder(pContext),
-          ElevatedButton(onPressed: () => {print("hi")}, child: Text("软件设置")),
+          ElevatedButton(onPressed: () => {}, child: const Text("软件设置")),
           Expanded(child: MoveWindow()),
           const WindowButtons()
         ],

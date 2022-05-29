@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/providers/MainStatus.dart';
+import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/funcs.dart';
 import 'package:visual_branching/util/models.dart';
@@ -12,7 +12,7 @@ class CtlBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      _styledBtn(
+      _StyledBtn(
         text: "备份到标头",
         colorData: Colors.blue,
         onTapFunc: (provider) async {
@@ -41,7 +41,7 @@ class CtlBtn extends StatelessWidget {
           });
         },
       ),
-      _styledBtn(
+      _StyledBtn(
           text: "回退到标头",
           colorData: Colors.blue,
           onTapFunc: (provider) {
@@ -57,7 +57,7 @@ class CtlBtn extends StatelessWidget {
               provider.updateVoidCall();
             }
           }),
-      _styledBtn(
+      _StyledBtn(
           text: "清空回收站",
           colorData: Colors.red,
           onTapFunc: (provider) {
@@ -74,13 +74,13 @@ class CtlBtn extends StatelessWidget {
   }
 }
 
-class _styledBtn extends StatelessWidget {
+class _StyledBtn extends StatelessWidget {
   final String text;
   final MaterialColor colorData;
 
   final void Function(MainStatus) onTapFunc;
-  // _styledBtn(this.text);
-  const _styledBtn(
+  // _StyledBtn(this.text);
+  const _StyledBtn(
       {Key? key,
       required this.text,
       required this.onTapFunc,

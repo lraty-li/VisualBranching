@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/Repository/ReposList.dart';
-import 'package:visual_branching/providers/MainStatus.dart';
-import 'package:visual_branching/util/models.dart';
+import 'package:visual_branching/Repository/repos_list.dart';
+import 'package:visual_branching/providers/main_status.dart';
 
 void openRepoDialog(BuildContext context) {
   showDialog<String?>(
@@ -10,7 +9,7 @@ void openRepoDialog(BuildContext context) {
       builder: (context) {
         return Consumer<MainStatus>(
             builder: (context, provider, child) => AlertDialog(
-                  title: Text("打开库"),
+                  title: const Text("打开库"),
                   content: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.5,
                     height: MediaQuery.of(context).size.height * 0.6,

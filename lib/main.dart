@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/providers/MainStatus.dart';
+import 'package:visual_branching/providers/main_status.dart';
 
-import 'mainPage.dart';
+import 'main_page.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -12,7 +12,7 @@ void main() {
   doWhenWindowReady(() {
     final win = appWindow;
     const initialSize = Size(1280, 720);
-    win.minSize = Size(640, 640);
+    win.minSize = const Size(640, 640);
     win.size = initialSize;
     win.alignment = Alignment.center;
     win.title = "Visual Branching";

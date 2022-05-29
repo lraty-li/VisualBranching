@@ -70,10 +70,11 @@ class Repo {
 
   _copyTo(String filePath, CopyDirection direction) async {
     //todo 异步
-    Directory checkDir = Directory(filePath);
-    if (!checkDir.existsSync()) {
-      checkDir.createSync(recursive: true);
-    }
+    // 传入的filePath可能为leafIdName
+    // Directory checkDir = Directory(filePath);
+    // if (!checkDir.existsSync()) {
+    //   checkDir.createSync(recursive: true);
+    // }
 
     //todo 出错控制
 
@@ -113,9 +114,9 @@ class Repo {
               genLeafPath(ValueKey(filePath), LeafFrom.recycleBin);
 
           final leafDircetory = Directory(leafPath);
-          final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
+          // final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
 
-          if (Directory(recyclePath).existsSync()) {
+          if (leafDircetory.existsSync()) {
             try {
               await leafDircetory.rename(
                   "$repoPath${Platform.pathSeparator}leafs${Platform.pathSeparator}$filePath");
@@ -130,13 +131,14 @@ class Repo {
           //todo 垃圾桶清理
           break;
         }
-        break;
       case CopyDirection.leafs2recycle:
         {
           //todo 基本一致 [case recycle2Leafs]
+
           String leafPath = genLeafPath(ValueKey(filePath), LeafFrom.leafs);
 
           final leafDircetory = Directory(leafPath);
+
           final recyclePath = "$repoPath${Platform.pathSeparator}recycleBin";
 
           if (Directory(recyclePath).existsSync()) {
@@ -160,6 +162,11 @@ class Repo {
       case CopyDirection.target2recycle:
         // todo 与 target2Leaf完全一致,传入参数改为只传leafIdname？
         {
+          final leafRecycleDir = Directory(filePath);
+          if (!leafRecycleDir.existsSync()) {
+            leafRecycleDir.createSync(recursive: true);
+          }
+
           comparionTable.forEach((saveFileName, targetFileAbsPath) {
             File tempFile = File(targetFileAbsPath);
             //todo 异步
@@ -209,11 +216,16 @@ class Repo {
         break;
       case LeafFrom.recycleBin:
         {
+          //todo 是否修改备注？
           final targetLeaf = getLeafByKey(targetLeafKey, LeafFrom.recycleBin);
+          targetLeaf.annotation = "由回收站还原:${targetLeaf.annotation}";
           leafs.add(targetLeaf);
           leafRcyclBin.remove(targetLeaf);
           //建立关系
           _headerRelation(targetLeafKey, false);
+
+          // 移动节点文件
+          _copyTo(targetLeafKey.value, CopyDirection.recycle2Leafs);
           break;
         }
       case LeafFrom.autoSave:
@@ -245,10 +257,8 @@ class Repo {
     //     CopyDirection.target2Leaf);
 
     //覆盖到目标文件处
-    _copyTo(genLeafPath(targetLeafKey, belonging), CopyDirection.leaf2Target);
-
-    // 移动节点文件
-    _copyTo(targetLeafKey.value, CopyDirection.recycle2Leafs);
+    _copyTo(
+        genLeafPath(targetLeafKey, LeafFrom.leafs), CopyDirection.leaf2Target);
 
     //移动标头到回退到的leaf
     headerLeafKey = targetLeafKey;
@@ -428,7 +438,7 @@ class Repo {
     //todo 出错控制
     //todo 常用路径的Directory对象作为repo属性？
     final recycleBin =
-        Directory(repoPath + Platform.pathSeparator + "recycleBin");
+        Directory("$repoPath${Platform.pathSeparator}recycleBin");
     recycleBin.deleteSync(recursive: true);
     recycleBin.createSync();
     toJsonFile();
@@ -437,9 +447,9 @@ class Repo {
   static String _genLeafName(int nowUnixEpoch, NodeType nodeType) {
     switch (nodeType) {
       case NodeType.manually:
-        return nowUnixEpoch.toString() + "N" + "M";
+        return "${nowUnixEpoch}NM";
       case NodeType.automatically:
-        return nowUnixEpoch.toString() + "N" + "A";
+        return "${nowUnixEpoch}NA";
     }
   }
 

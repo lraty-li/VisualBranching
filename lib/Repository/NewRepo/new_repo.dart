@@ -1,10 +1,8 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:visual_branching/Repository/NewRepo/fileChosing.dart';
-import 'package:visual_branching/Repository/NewRepo/repoConfigModel.dart';
-import 'package:visual_branching/Repository/NewRepo/repoOptions.dart';
+import 'package:visual_branching/Repository/NewRepo/file_chosing.dart';
+import 'package:visual_branching/Repository/NewRepo/repo_config_model.dart';
+import 'package:visual_branching/Repository/NewRepo/repo_options.dart';
 import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/models.dart';
 
@@ -17,7 +15,7 @@ void newRepoDialog(BuildContext context) {
         return ChangeNotifierProvider(
             create: (context) => RepoConfig(targetFilePaths: []),
             child: AlertDialog(
-                title: Text("新建库"),
+                title: const Text("新建库"),
                 actions: <Widget>[
                   Consumer<RepoConfig>(
                     builder: (context, repoConfig, child) {
@@ -48,7 +46,7 @@ void newRepoDialog(BuildContext context) {
                                 Navigator.of(context).pop();
                               }
                             : null,
-                        child: Text("确认"),
+                        child: const Text("确认"),
                       );
                     },
                   ),
@@ -56,7 +54,7 @@ void newRepoDialog(BuildContext context) {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("取消"),
+                    child: const Text("取消"),
                   ),
                 ],
                 content: SizedBox(

@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:visual_branching/util/models.dart';
 
 Widget? _ifAutoSaveIcon(bool autosave) {
-  if (autosave) return Icon(Icons.update);
+  if (autosave) return const Icon(Icons.update);
   return null;
 }
 
 Widget loadRepos(void Function(Repo) onTapfunc) {
-  Widget divider1 = Divider(
+  Widget divider1 = const Divider(
     color: Colors.blue,
   );
-  Widget divider2 = Divider(color: Colors.green);
+  Widget divider2 = const Divider(color: Colors.green);
   List<Repo> reposList = [];
 
 //读取现有库
