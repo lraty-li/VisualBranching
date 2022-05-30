@@ -43,19 +43,15 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
             SimpleDialogOption(
               onPressed: (() {
                 // 复制节点信息
-                final targetLeaf =
-                    Provider.of<MainStatus>(context, listen: false)
-                        .openedRepoList
-                        .first
-                        .leafs
-                        .firstWhere((element) => element.leafKey == nodeKey);
-                Provider.of<MainStatus>(context, listen: false)
-                    .openedRepoList
-                    .first
+                final provider =
+                    Provider.of<MainStatus>(context, listen: false);
+                final repo = provider.openedRepoList.first;
+                final targetLeaf = repo.leafs
+                    .firstWhere((element) => element.leafKey == nodeKey);
+                repo
                     .newLeaf(NodeType.manually, targetLeaf.annotation, true)
                     .then((newLeaf) {
-                  Provider.of<MainStatus>(context, listen: false)
-                      .focusToNode(newLeaf.leafKey.value);
+                  provider.focusToNode(newLeaf.leafKey.value);
                 });
 
                 Navigator.of(context).pop();
@@ -77,17 +73,17 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
             ),
             SimpleDialogOption(
               onPressed: (() async {
+                final provider =
+                    Provider.of<MainStatus>(context, listen: false);
+                final navigator = Navigator.of(context);
                 String? newAnnotation =
                     await strDialog(context, "修改备注", "输入新备注");
-                Provider.of<MainStatus>(context, listen: false)
-                    .openedRepoList
-                    .first
+                provider.openedRepoList.first
                     .alterLeafAnno(nodeKey, newAnnotation ?? "");
 
-                Provider.of<MainStatus>(context, listen: false)
-                    .updateVoidCall();
+                provider.updateVoidCall();
 
-                Navigator.of(context).pop();
+                navigator.pop();
               }),
               child: const Text("修改备注"),
             ),

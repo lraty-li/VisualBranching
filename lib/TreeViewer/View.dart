@@ -195,18 +195,18 @@ class Foo extends SingleChildRenderObjectWidget {
   const Foo({Widget? child, Key? key}) : super(child: child, key: key);
 
   @override
-  _Foo createRenderObject(BuildContext context) {
-    // return _Foo()..index = index;
-    return _Foo();
+  FooRPB createRenderObject(BuildContext context) {
+    // return FooRPB()..index = index;
+    return FooRPB();
   }
 
   @override
-  void updateRenderObject(BuildContext context, _Foo renderObject) {
+  void updateRenderObject(BuildContext context, FooRPB renderObject) {
     // renderObject..index = index;
   }
 }
 
-class _Foo extends RenderProxyBox {
+class FooRPB extends RenderProxyBox {
   // late int index;
 }
 

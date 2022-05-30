@@ -33,10 +33,8 @@ void openRepoDialog(BuildContext context) {
                       }
                     } else {
                       // 请求未结束，显示loading
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     }
-
-                    loadRepos();
                   },
                 )),
           ),

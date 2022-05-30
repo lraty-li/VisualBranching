@@ -37,7 +37,7 @@ class RRepoOptionsState extends State<RepoOptions> {
                 errorText: _nameErrorText.value)),
         Row(
           children: [
-            const Text("开启自动保存"),
+            const Text("开启自动保存（未完成）"),
 
             // Builder(
             //   builder: (BuildContext context) {
