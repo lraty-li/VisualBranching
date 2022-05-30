@@ -135,8 +135,13 @@ class _TreeViewState extends State<TreeView> with TickerProviderStateMixin {
   }
 
   void _onAnimating() {
-    //todo FlutterError (Build scheduled during frame.
-    _transformationController.value = _anmation!.value;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      //TODO why [_animation] will be null?
+      if (_anmation != null) {
+        _transformationController.value = _anmation!.value;
+      }
+    });
+
     if (!_animateCtl.isAnimating) {
       _anmation!.removeListener(_onAnimating);
       _anmation = null;

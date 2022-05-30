@@ -480,8 +480,8 @@ class Repo {
 
     Directory leafsPath = Directory("$repoPath${Platform.pathSeparator}leafs");
 
-    autoSavePath.create(recursive: true);
-    leafsPath.create(recursive: true);
+    await autoSavePath.create(recursive: true);
+    await leafsPath.create(recursive: true);
 
     //生成对照表
     Map<String, String> newComparsionTab = {};
@@ -505,11 +505,10 @@ class Repo {
   static Future<Repo> fromJson(String jsonFilePath) async {
     //从json文件读取库
     File jsonFile = File(jsonFilePath);
-    //todo异步
     final jsonString = await jsonFile.readAsString();
 
     Map<String, dynamic> repoJsonObj = json.decode(jsonString);
-    //todo 错误检测
+    //TODO 外部错误检测
 
     //leafIdName , annotation
     Map<String, dynamic> tempMap = repoJsonObj["leafs"];

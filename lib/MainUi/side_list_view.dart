@@ -55,7 +55,6 @@ class SideListView extends StatelessWidget {
                 //todo 除了聚焦标头，其他都是聚焦到header。
                 //在retriveTo 中，leaf已经从recycleBin中移到leafs
                 provider.focusToNode(ValueKey(targetLeaf.leafKey.value));
-                provider.updateVoidCall();
               }),
               //显示自动保存
               if (isAutoSave)
