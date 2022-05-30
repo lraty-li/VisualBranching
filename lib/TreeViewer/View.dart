@@ -100,7 +100,7 @@ class _TreeViewState extends State<TreeView> with TickerProviderStateMixin {
             graph: graph,
             algorithm: _CallbackBuchheimWalkerAlgorithm(
                 builder, TreeEdgeRenderer(builder), () {
-              _jumpToNode(graph.getNodeUsingId(focusedNode.value));
+              _jumpToNode(graph.getNodeUsingId(focusedNode));
             }),
             paint: Paint()
               ..color = Colors.green

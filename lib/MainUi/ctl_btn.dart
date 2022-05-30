@@ -34,10 +34,9 @@ class CtlBtn extends StatelessWidget {
                       .getNodeUsingId(provider.openedRepoList.first.repoName),
                   Node.Id(newLeaf.leafKey.value));
             }
-            provider.focusToNode(ValueKey(
+            provider.focusToNode(
                 provider.openedRepoList.first.headerLeafKey?.value ??
-                    provider.openedRepoList.first.repoName));
-            provider.updateVoidCall();
+                    provider.openedRepoList.first.repoName);
           });
         },
       ),
@@ -53,8 +52,7 @@ class CtlBtn extends StatelessWidget {
             } else {
               provider.openedRepoList.first
                   .retirveToLeaf(ValueKey(tempOldheaderId), LeafFrom.leafs);
-              provider.focusToNode(ValueKey(tempOldheaderId));
-              provider.updateVoidCall();
+              provider.focusToNode(tempOldheaderId);
             }
           }),
       _StyledBtn(

@@ -32,9 +32,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                 Provider.of<MainStatus>(context, listen: false)
 
                     //todo 已有nodeKey
-                    .focusToNode(ValueKey(nodeKey.value));
-                Provider.of<MainStatus>(context, listen: false)
-                    .updateVoidCall();
+                    .focusToNode(nodeKey.value);
 
                 Navigator.of(context).pop();
               }),
@@ -57,9 +55,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                     .newLeaf(NodeType.manually, targetLeaf.annotation, true)
                     .then((newLeaf) {
                   Provider.of<MainStatus>(context, listen: false)
-                      .focusToNode(ValueKey(newLeaf.leafKey.value));
-                  Provider.of<MainStatus>(context, listen: false)
-                      .updateVoidCall();
+                      .focusToNode(newLeaf.leafKey.value);
                 });
 
                 Navigator.of(context).pop();
@@ -97,12 +93,13 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
             ),
             SimpleDialogOption(
               onPressed: (() {
-                Provider.of<MainStatus>(context, listen: false)
-                    .openedRepoList
-                    .first
-                    .delLeaf(nodeKey);
-                Provider.of<MainStatus>(context, listen: false)
-                    .updateVoidCall();
+                final provider =
+                    Provider.of<MainStatus>(context, listen: false);
+                final repo = provider.openedRepoList.first;
+                final parentLeaf = repo.getParentLeaf(nodeKey);
+                repo.delLeaf(nodeKey);
+                provider.focusToNode(
+                    parentLeaf == null ? repo.repoName : parentLeaf.value);
                 Navigator.of(context).pop();
               }),
               child: const Text("删除该节点"),

@@ -8,7 +8,7 @@ class MainStatus extends ChangeNotifier {
   //opened repo, but only one repo supported now , maybe muti repo will be support
   List<Repo> openedRepoList = [];
   List<Graph> graphs = [];
-  List<ValueKey<dynamic>> focusedNode = [];
+  List<String> focusedNode = [];
 
   updateVoidCall() {
     //todo 单个repo调用时导致全部更新（虽然目前不支持打开多个repo）
@@ -17,11 +17,12 @@ class MainStatus extends ChangeNotifier {
 
   /// todo make add list ,run notify listeners only once
   addOpenRepo(Repo item) {
+    print("addOpenRepo invok");
     openedRepoList.add(item);
     graphs.add(Graph()..isTree = true);
     //save ref of animate ctl
 
-    focusedNode.add(ValueKey(item.repoName));
+    focusedNode.add(item.repoName);
     notifyListeners();
   }
 
@@ -39,7 +40,7 @@ class MainStatus extends ChangeNotifier {
     notifyListeners();
   }
 
-  focusToNode(ValueKey<String> key) {
+  focusToNode(String key) {
     focusedNode.first = key;
     notifyListeners();
   }

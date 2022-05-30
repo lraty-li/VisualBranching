@@ -39,7 +39,7 @@ class SideListView extends StatelessWidget {
             children: [
               //显示节点头
               _buildListView(SideList.headOfBranch, rootLeafs, (index) {
-                provider.focusToNode(rootLeafs[index].leafKey);
+                provider.focusToNode(rootLeafs[index].leafKey.value);
               }),
 
               //显示回收站
@@ -54,7 +54,7 @@ class SideListView extends StatelessWidget {
 
                 //todo 除了聚焦标头，其他都是聚焦到header。
                 //在retriveTo 中，leaf已经从recycleBin中移到leafs
-                provider.focusToNode(ValueKey(targetLeaf.leafKey.value));
+                provider.focusToNode(targetLeaf.leafKey.value);
               }),
               //显示自动保存
               if (isAutoSave)

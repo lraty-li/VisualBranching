@@ -41,7 +41,7 @@ class Repo {
   Map<ValueKey<String>, List<ValueKey<String>>> realtions;
 
   static delRepo(Repo repo) {
-    //todo 停止自动保存
+    //TODO 停止自动保存
 
     try {
       //直接删除repo文件夹
@@ -53,7 +53,7 @@ class Repo {
   }
 
   static runAutoSave() {
-    //todo impl
+    //TODO impl
   }
 
   Leaf getLeafByKey(ValueKey<String> leafKey, LeafFrom belonging) {
@@ -70,10 +70,6 @@ class Repo {
   _copyTo(String filePath, CopyDirection direction) async {
     //todo 异步
     // 传入的filePath可能为leafIdName
-    // Directory checkDir = Directory(filePath);
-    // if (!checkDir.existsSync()) {
-    //   checkDir.createSync(recursive: true);
-    // }
 
     //todo 出错控制
 
@@ -127,7 +123,6 @@ class Repo {
             //todo 垃圾桶不存在
           }
 
-          //todo 垃圾桶清理
           break;
         }
       case CopyDirection.leafs2recycle:
@@ -262,9 +257,17 @@ class Repo {
     toJsonFile();
   }
 
+  ValueKey<String>? getParentLeaf(ValueKey<String> targetLeafKey) {
+    MapEntry<ValueKey<String>, List<ValueKey<String>>> upStream = realtions
+        .entries
+        .firstWhere((pair) => pair.value.contains(targetLeafKey),
+            orElse: () => const MapEntry(ValueKey(""), []));
+    return upStream.key.value.isEmpty ? null : upStream.key;
+  }
+
   delLeaf(ValueKey<String> targetLeafKey) async {
     //移动节点(逻辑删除,移动到回收站List)
-    Leaf targetLeaf = getLeafByKey(targetLeafKey, LeafFrom.leafs);
+    final Leaf targetLeaf = getLeafByKey(targetLeafKey, LeafFrom.leafs);
     leafRcyclBin.add(targetLeaf);
     leafs.remove(targetLeaf);
 
@@ -348,7 +351,6 @@ class Repo {
       rootLeafKeys.add(newLeafKey);
       headerLeafKey = newLeafKey;
     } else {
-      //todo 简化？(这两行是否等效)
       if (realtions[headerLeafKey as ValueKey<String>] == null) {
         realtions[headerLeafKey as ValueKey<String>] = [newLeafKey];
       } else {
