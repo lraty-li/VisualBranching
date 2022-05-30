@@ -26,8 +26,9 @@ class RepoConfig extends ChangeNotifier {
     notifyListeners();
   }
 
-  addTarget(String path) {
-    targetFilePaths.add(path);
+  addAllTarget(List<String> paths) {
+    //run validate manually for adding file in a loop will cause muti addTarget
+    targetFilePaths.addAll(paths);
     _validate();
   }
 
@@ -41,7 +42,6 @@ class RepoConfig extends ChangeNotifier {
     _validate();
   }
 
-
   setRepoName(String newRepoName) {
     repoName = newRepoName;
     _validate();
@@ -51,13 +51,14 @@ class RepoConfig extends ChangeNotifier {
     autoSave = value;
     _validate();
   }
+
   setAutoSaveIntervel(int value) {
-    autoSaveInterval=value;
+    autoSaveInterval = value;
     _validate();
   }
 
   setAutoSaveNums(int value) {
-    autoSavesNums=value;
+    autoSavesNums = value;
     _validate();
   }
 

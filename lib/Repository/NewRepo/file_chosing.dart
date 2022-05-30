@@ -32,6 +32,7 @@ class _FileChosingState extends State<FileChosing> {
           setState(() {});
         },
         onDragDone: (detail) {
+          List<String> filePathList = [];
           for (final newfile in detail.files) {
             bool noSame = true;
             if (FileSystemEntity.isDirectorySync(newfile.path)) {
@@ -50,7 +51,9 @@ class _FileChosingState extends State<FileChosing> {
                     }
                   }
                   //todo batchupdate？
-                  if (noSame) widget.configHandle.addTarget(element.path);
+                  if (noSame) {
+                    filePathList.add(element.path);
+                  }
                 }
               }
             } else {
@@ -62,11 +65,14 @@ class _FileChosingState extends State<FileChosing> {
                   break;
                 }
               }
-              if (noSame) widget.configHandle.addTarget(newfile.path);
+              if (noSame) {
+                filePathList.add(newfile.path);
+              }
             }
           }
 
-          setState(() {});
+          widget.configHandle.addAllTarget(filePathList);
+          // setState(() {});
         },
         child: Expanded(
           child: Container(
@@ -79,7 +85,6 @@ class _FileChosingState extends State<FileChosing> {
                   ListView.builder(
                       itemCount: widget.configHandle.targetFilePaths.length,
                       itemBuilder: (BuildContext context, int index) {
-                        //todo 检查平台？
                         var splitedStr = widget
                             .configHandle.targetFilePaths[index]
                             .split(Platform.pathSeparator);
@@ -109,6 +114,7 @@ class _FileChosingState extends State<FileChosing> {
         children: [
           ElevatedButton(
               onPressed: () async {
+                List<String> filePathList = [];
                 FilePickerResult? result =
                     await FilePicker.platform.pickFiles(allowMultiple: true);
 
@@ -124,10 +130,11 @@ class _FileChosingState extends State<FileChosing> {
                       }
                     }
                     if (noSame) {
-                      widget.configHandle.addTarget(newfile.path);
+                      filePathList.add(newfile.path);
                     }
                   }
-                  setState(() {});
+                  widget.configHandle.addAllTarget(filePathList);
+                  // setState(() {});
                 } else {
                   // User canceled the picker
                 }

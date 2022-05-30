@@ -21,7 +21,7 @@ class SideListView extends StatelessWidget {
         length: isAutoSave ? 3 : 2,
         child: Scaffold(
           appBar: PreferredSize(
-            //todo 72 or 46? check define of [Tab]
+            //TODO 72 or 46? check define of [Tab]
             //2 of default border?
             preferredSize: const Size.fromHeight(48),
             child: AppBar(
@@ -52,7 +52,6 @@ class SideListView extends StatelessWidget {
                 targetRepo.retirveToLeaf(
                     targetLeaf.leafKey, LeafFrom.recycleBin);
 
-                //todo 除了聚焦标头，其他都是聚焦到header。
                 //在retriveTo 中，leaf已经从recycleBin中移到leafs
                 provider.focusToNode(targetLeaf.leafKey.value);
               }),
@@ -60,7 +59,6 @@ class SideListView extends StatelessWidget {
               if (isAutoSave)
                 _buildListView(SideList.recycleBin, targetRepo.autoSaves,
                     (index) {
-                  //todo copy the leaf
                   targetRepo.retirveToLeaf(
                       targetRepo.autoSaves[index].leafKey, LeafFrom.autoSave);
                 }),

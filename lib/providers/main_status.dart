@@ -11,13 +11,12 @@ class MainStatus extends ChangeNotifier {
   List<String> focusedNode = [];
 
   updateVoidCall() {
-    //todo 单个repo调用时导致全部更新（虽然目前不支持打开多个repo）
+    //TODO 单个repo调用时导致全部更新（虽然目前不支持打开多个repo）
     notifyListeners();
   }
 
-  /// todo make add list ,run notify listeners only once
+  // TODO make add list ,run notify listeners only once
   addOpenRepo(Repo item) {
-    print("addOpenRepo invok");
     openedRepoList.add(item);
     graphs.add(Graph()..isTree = true);
     //save ref of animate ctl
@@ -29,7 +28,7 @@ class MainStatus extends ChangeNotifier {
   removeOpenedByKey(ValueKey targetRepoKey) {
     openedRepoList.remove(openedRepoList
         .firstWhere((element) => element.repoKey == targetRepoKey));
-    //todo 删除对应graph
+    //TODO 删除对应graph
     notifyListeners();
   }
 

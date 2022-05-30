@@ -66,7 +66,10 @@ class _TreeViewState extends State<TreeView> with TickerProviderStateMixin {
     graph.addNode(headNode);
 
     //删除旧head，
-    graph.removeNode(currBaseNode);
+    //当一个repo为空，并在已经打开一个repo的情况下被打开，将移除repoIdName 节点导致graph无节点
+    if (graph.nodes.length >= 2) {
+      graph.removeNode(currBaseNode);
+    }
 
     currBaseNode = headNode;
 
