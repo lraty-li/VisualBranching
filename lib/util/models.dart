@@ -1,9 +1,18 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:visual_branching/util/common.dart';
+
+//https://stackoverflow.com/questions/61919395/how-to-generate-random-string-in-dart
+//maybe no quicker way
+const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+Random _rnd = Random();
+
+String getRandom6String() => String.fromCharCodes(Iterable.generate(
+    6, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
 
 class Repo {
   String repoName;
@@ -529,7 +538,10 @@ class Repo {
     for (String element in targetFilePaths) {
       List<String> splitd = element.split(Platform.pathSeparator);
       //Windows下最短:目标文件在C盘根， C:/targetFile
-      newComparsionTab[splitd[splitd.length - 2] + splitd.last] = element;
+      //随机生成6位字符
+      newComparsionTab[
+              "${getRandom6String()}-${splitd[splitd.length - 2]}-${splitd.last}"] =
+          element;
     }
 
     return Repo(

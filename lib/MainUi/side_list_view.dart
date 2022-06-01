@@ -186,7 +186,7 @@ Widget _buildListView(SideList tapFrom, List<Leaf> theList,
         child: ListTile(
           // title: _buildBrefTile(theList[index].createdTime.toLocal().toString(),
           title: _buildBrefTile(
-              theList[index].leafKey.value, theList[index].annotation),
+              theList[index].createdTime.toString(), theList[index].annotation),
         ),
       );
     },

@@ -93,11 +93,10 @@ class AutoSaveInstance {
     saveTimer = Timer.periodic(Duration(minutes: autoSaveIntevalMins), (timer) {
       if (autoSaveCTL) {
         if (autoSaveIdNames.length >= autoSaveNum) {
-          //TODO 自动保存设置：必须大于1
-          //TODO 此处操作会触发UI端更新
+          //TODO 文件夹操作会触发UI端更新
           //TODO 确定最老备份？
           //清理自动保存,删除第一个(autoSaveIdNames最小为0)
-          final String oldestIdName = "${autoSaveIdNames.first}";
+          final String oldestIdName = "${autoSaveIdNames[0]}";
           autoSaveIdNames.removeAt(0);
           try {
             Directory(
@@ -107,33 +106,43 @@ class AutoSaveInstance {
               showVerbose("清理备份[$oldestIdName]完成");
             }
           } catch (e) {
-            showError("清理备份[$oldestIdName]失败");
+            showError("清理备份[$oldestIdName]失败!!!!!!,请及时暂停自动保存");
             showError(e.toString());
           }
         }
         //创建节点文件夹
-        final String leafIdName = "${DateTime.now().millisecondsSinceEpoch}NA";
-        Directory("${autoSaveDir.path}${Platform.pathSeparator}$leafIdName")
-            .createSync();
+        try {
+          final String leafIdName =
+              "${DateTime.now().millisecondsSinceEpoch}NA";
+          Directory("${autoSaveDir.path}${Platform.pathSeparator}$leafIdName")
+              .createSync();
 
-        // 复制目标文件到自动保存文件夹
-        comparionTable.forEach((saveFileName, targetFileAbsPath) {
-          File tempFile = File(targetFileAbsPath);
-          if (tempFile.existsSync()) {
-            //生成伪leafIdName，写入json
-            autoSaveIdNames.add(leafIdName);
-            jsonObj.writeAsStringSync(json.encode(autoSaveIdNames));
+          // 复制目标文件到自动保存文件夹
+          autoSaveIdNames.add(leafIdName);
+          comparionTable.forEach((saveFileName, targetFileAbsPath) {
+            File tempFile = File(targetFileAbsPath);
+            if (tempFile.existsSync()) {
+              //生成伪leafIdName，写入json
+              jsonObj.writeAsStringSync(json.encode(autoSaveIdNames));
 
-            tempFile.copySync(
-                "${autoSaveDir.path}${Platform.pathSeparator}$leafIdName${Platform.pathSeparator}$saveFileName");
-          } else {
-            //目标文件被删除 跳过本次保存
-            showError(
-                "${tempFile.path.split(Platform.pathSeparator).last} 不存在, 跳过本该复制");
+              tempFile.copySync(
+                  "${autoSaveDir.path}${Platform.pathSeparator}$leafIdName${Platform.pathSeparator}$saveFileName");
+            } else {
+              //目标文件被删除 跳过本次保存
+              showError(
+                  "${tempFile.path.split(Platform.pathSeparator).last} 不存在, 跳过本该复制");
+            }
+          });
+
+          if (verboseCTL) {
+            showVerbose("$leafIdName 备份完成");
           }
-        });
-        if (verboseCTL) {
-          showVerbose("$leafIdName 备份完成");
+        } catch (e) {
+          //库被删除
+          showError(e.toString());
+          //TODO 保留错误信息
+          showError("出错了！,取消 ${repoName} 的自动保存");
+          timer.cancel();
         }
       }
     });

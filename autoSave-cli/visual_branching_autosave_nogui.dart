@@ -41,6 +41,7 @@ void main(List<String> args) async {
               showMsg("重新读取备份配置");
               manager = loadConfig();
               showMsg("刷新备份设置完成");
+              autoSaveTogle=true;
               break;
             }
           //"e"

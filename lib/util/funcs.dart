@@ -35,9 +35,7 @@ Future<int?> choseDialog(BuildContext context) {
       builder: (context) {
         return SimpleDialog(
           title: const Text("选择"),
-          children: [
-            SimpleDialogOption(onPressed: (() => {}))
-          ],
+          children: [SimpleDialogOption(onPressed: (() => {}))],
         );
       });
 }
@@ -68,18 +66,20 @@ Future<bool?> confirmDialog(
       });
 }
 
-showLoadingDialog(BuildContext context){
-    AlertDialog alert=AlertDialog(
-      content: Row(
-        children: const [
-          CircularProgressIndicator(),
-          // Container(margin: EdgeInsets.only(left: 7),child:Text("Loading..." )),
-        ],),
-    );
-    showDialog(barrierDismissible: false,
-      context:context,
-      builder:(BuildContext context){
-        return alert;
-      },
-    );
-  }
+showLoadingDialog(BuildContext context) {
+  AlertDialog alert = AlertDialog(
+    content: Row(
+      children: const [
+        CircularProgressIndicator(),
+        // Container(margin: EdgeInsets.only(left: 7),child:Text("Loading..." )),
+      ],
+    ),
+  );
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (BuildContext context) {
+      return alert;
+    },
+  );
+}

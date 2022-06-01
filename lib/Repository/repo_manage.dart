@@ -14,6 +14,7 @@ void repoManagDialog(BuildContext context) {
       context: context,
       builder: (context) {
         return AlertDialog(
+          //TODO 删除后,自动保存对应实例出错
           title: const Text("库管理"),
           content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.5,
@@ -81,7 +82,7 @@ void repoManagDialog(BuildContext context) {
                                           //todo impl
                                           //todo 关闭已打开 ()
                                           confirmDialog(context, "确认删除库？",
-                                                  "不会移动到系统回收站，删除后无法恢复。")
+                                                  "不会移动到系统回收站，删除后无法恢复。请刷新自动保存")
                                               .then((result) {
                                             if (result == true) {
                                               Provider.of<MainStatus>(context,
