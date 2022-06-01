@@ -3,6 +3,7 @@ import 'package:visual_branching/util/class_wraper.dart';
 
 class NumericalRangeFormatter extends TextInputFormatter {
   //自定义过滤器
+  //TODO 最小值1
   final int max;
   ClassWraper errTxtWarp;
   String errTxtTemplate;

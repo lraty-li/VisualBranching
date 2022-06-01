@@ -33,7 +33,6 @@ class Repo {
   List<Leaf> leafRcyclBin;
 
   //auto Saves
-  //TODO 需要刷新，自动保存独立(进程)运行。
   // TODO 当自动保存已被清理，但UI端尝试读取？ steamBuilder
   // List<Leaf> autoSaves;
 

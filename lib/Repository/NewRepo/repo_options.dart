@@ -35,9 +35,11 @@ class RRepoOptionsState extends State<RepoOptions> {
                     : widget.configHandle.repoName,
                 labelText: "库名称",
                 errorText: _nameErrorText.value)),
+        const Text("自动保存不在此软件运行"),
+        const Text("修改配置后请手动刷新自动保存"),
         Row(
           children: [
-            const Text("开启自动保存（未完成）"),
+            const Text("开启自动保存"),
 
             // Builder(
             //   builder: (BuildContext context) {

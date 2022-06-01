@@ -5,23 +5,32 @@ import 'dart:io';
 class AutoSaveManag {
   List<AutoSaveInstance> instances;
 
-  setAll(bool newCtl) {
-    instances.forEach((element) {
-      element.autoSaveCTL = newCtl;
-    });
-
-    reflashByIdName() {}
-
-    removeByIdName() {}
+  cancelAllTimer() {
+    for (var element in instances) {
+      element.saveTimer.cancel();
+    }
   }
+
+  setAllautoSave(bool newCtl) {
+    for (var element in instances) {
+      element.autoSaveCTL = newCtl;
+    }
+  }
+
+  setAllverbose(bool newCtl) {
+    for (var element in instances) {
+      element.verboseCTL = newCtl;
+    }
+  }
+
+  reflashByIdName() {}
+
+  removeByIdName() {}
 
   AutoSaveManag({required this.instances});
 }
 
-//TODO 更新 repo json 冲突？
-//TODO 回退到自动保存：移动/复制 leaf？
-//TODO 接受“刷新配置”指令,从控制台stdin或管道，暂停（取消）全部自动保存并清除，重新读入？
-// TODO UI端不会有自动保存写入，分离autoSave.json
+// UI端不会有自动保存写入，分离autoSave.json
 
 // a repo thst enable autosave
 class AutoSaveInstance {
@@ -37,9 +46,27 @@ class AutoSaveInstance {
   int autoSaveNum;
 
   bool autoSaveCTL;
+  bool verboseCTL;
   late Timer saveTimer;
   late List<String> autoSaveIdNames;
   late File jsonObj;
+
+  // 是否显示保存信息
+  late bool showVerboseCTL;
+  // 批量自动保存清理，计数器,默认为 [autoSaveNum] 的一半
+  // late int batchCleanerCounter;
+
+  showInfo(String msg) {
+    print("[info] $repoName ${DateTime.now()} : $msg");
+  }
+
+  showVerbose(String msg) {
+    print("[verbose] $repoName ${DateTime.now()} : $msg");
+  }
+
+  showError(String msg) {
+    print("[ERROR] $repoName ${DateTime.now()} : $msg");
+  }
 
   AutoSaveInstance(
       {required this.repoName,
@@ -47,48 +74,68 @@ class AutoSaveInstance {
       required this.comparionTable,
       required this.autoSaveIntevalMins,
       required this.autoSaveNum,
-      this.autoSaveCTL = false}) {
+      this.autoSaveCTL = false,
+      this.verboseCTL = true}) {
     final repoPathStr =
-        "${Directory.current.path}${Platform.pathSeparator}repos${Platform.pathSeparator}${repoIdName}${Platform.pathSeparator}";
+        "${Directory.current.path}${Platform.pathSeparator}repos${Platform.pathSeparator}$repoIdName${Platform.pathSeparator}";
 
     //TODO 不存在则创建
     jsonObj = File("${repoPathStr}autoSaves.json");
-    autoSaveIdNames = List<String>.from(json.decode(jsonObj.readAsStringSync()));
+    autoSaveIdNames =
+        List<String>.from(json.decode(jsonObj.readAsStringSync()));
 
     final autoSaveDir = Directory("${repoPathStr}autoSaves");
 
     if (!autoSaveDir.existsSync()) {
       autoSaveDir.createSync(recursive: true);
     }
-    saveTimer = Timer.periodic(Duration(seconds: 5), (timer) {
-      if (autoSaveCTL) {
-        //TODO 路径
 
+    saveTimer = Timer.periodic(Duration(minutes: autoSaveIntevalMins), (timer) {
+      if (autoSaveCTL) {
+        if (autoSaveIdNames.length >= autoSaveNum) {
+          //TODO 自动保存设置：必须大于1
+          //TODO 此处操作会触发UI端更新
+          //TODO 确定最老备份？
+          //清理自动保存,删除第一个(autoSaveIdNames最小为0)
+          final String oldestIdName = "${autoSaveIdNames.first}";
+          autoSaveIdNames.removeAt(0);
+          try {
+            Directory(
+                    "${autoSaveDir.path}${Platform.pathSeparator}$oldestIdName")
+                .deleteSync(recursive: true);
+            if (verboseCTL) {
+              showVerbose("清理备份[$oldestIdName]完成");
+            }
+          } catch (e) {
+            showError("清理备份[$oldestIdName]失败");
+            showError(e.toString());
+          }
+        }
         //创建节点文件夹
         final String leafIdName = "${DateTime.now().millisecondsSinceEpoch}NA";
-        Directory("${autoSaveDir.path}${Platform.pathSeparator}${leafIdName}")
+        Directory("${autoSaveDir.path}${Platform.pathSeparator}$leafIdName")
             .createSync();
 
         // 复制目标文件到自动保存文件夹
         comparionTable.forEach((saveFileName, targetFileAbsPath) {
           File tempFile = File(targetFileAbsPath);
           if (tempFile.existsSync()) {
-            //TODO 生成伪leaf，写入json
+            //生成伪leafIdName，写入json
             autoSaveIdNames.add(leafIdName);
             jsonObj.writeAsStringSync(json.encode(autoSaveIdNames));
 
             tempFile.copySync(
-                "${autoSaveDir.path}${Platform.pathSeparator}${leafIdName}" +
-                    Platform.pathSeparator +
-                    saveFileName);
+                "${autoSaveDir.path}${Platform.pathSeparator}$leafIdName${Platform.pathSeparator}$saveFileName");
           } else {
-            //TODO 目标文件被删除，关闭periodic? / 跳过本次保存
-            print(" ${repoName}目标文件被删除");
+            //目标文件被删除 跳过本次保存
+            showError(
+                "${tempFile.path.split(Platform.pathSeparator).last} 不存在, 跳过本该复制");
           }
         });
+        if (verboseCTL) {
+          showVerbose("$leafIdName 备份完成");
+        }
       }
-
-      //TODO batch 清理自动保存
     });
   }
 }
