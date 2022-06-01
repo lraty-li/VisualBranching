@@ -12,6 +12,7 @@ class MainStatus extends ChangeNotifier {
 
   updateVoidCall() {
     //TODO 单个repo调用时导致全部更新（虽然目前不支持打开多个repo）
+    //TODO 分离state ，单组件更新
     notifyListeners();
   }
 

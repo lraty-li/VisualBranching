@@ -94,6 +94,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                 final repo = provider.openedRepoList.first;
                 final parentLeaf = repo.getParentLeaf(nodeKey);
                 repo.delLeaf(nodeKey);
+                //聚焦到被删节点父节点而不是标头，避免当删除远处节点时聚焦到标头
                 provider.focusToNode(
                     parentLeaf == null ? repo.repoName : parentLeaf.value);
                 Navigator.of(context).pop();

@@ -33,7 +33,9 @@ class Repo {
   List<Leaf> leafRcyclBin;
 
   //auto Saves
-  List<Leaf> autoSaves;
+  //TODO 需要刷新，自动保存独立(进程)运行。
+  // TODO 当自动保存已被清理，但UI端尝试读取？ steamBuilder
+  // List<Leaf> autoSaves;
 
   ///these properties will not be writed to json
   String repoPath;
@@ -52,10 +54,6 @@ class Repo {
     }
   }
 
-  static runAutoSave() {
-    //TODO impl
-  }
-
   Leaf getLeafByKey(ValueKey<String> leafKey, LeafFrom belonging) {
     switch (belonging) {
       case LeafFrom.leafs:
@@ -63,12 +61,16 @@ class Repo {
       case LeafFrom.recycleBin:
         return leafRcyclBin.firstWhere((element) => element.leafKey == leafKey);
       case LeafFrom.autoSave:
-        return autoSaves.firstWhere((element) => element.leafKey == leafKey);
+        {
+          //TODO 丢失时间信息
+          return Leaf(leafKey, "由自动保存复制");
+          // return autoSaves.firstWhere((element) => element.leafKey == leafKey);
+        }
     }
   }
 
   _copyTo(String filePath, CopyDirection direction) async {
-    //todo 异步
+    //TODO cmd 复制?
     // 传入的filePath可能为leafIdName
 
     //todo 出错控制
@@ -151,8 +153,38 @@ class Repo {
           break;
         }
       case CopyDirection.autoSave2Leafs:
-        // TODO: Handle this case.
-        break;
+        {
+          //filePath will be [targetLeaf.leafKey.value] the Id name of leaf, check delLeaf
+          //todo [genLeafPath] 的参数类型可否直接string
+
+          //由autoSave 复制到leaf
+          String autoLeafPath =
+              genLeafPath(ValueKey(filePath), LeafFrom.autoSave);
+          //在leafs中创建文件夹
+          final targetLeafDir =
+              Directory(genLeafPath(ValueKey(filePath), LeafFrom.leafs));
+          targetLeafDir.createSync();
+          final autoLeafDircetory = Directory(autoLeafPath);
+
+          if (autoLeafDircetory.existsSync()) {
+            try {
+              autoLeafDircetory.listSync().forEach((element) {
+                //应全为文件
+                if (element is File) {
+                  element.copySync(
+                      "${targetLeafDir.path}${Platform.pathSeparator}${element.path.split(Platform.pathSeparator).last}");
+                }
+              });
+            } on FileSystemException catch (e) {
+              //文件夹移动失败
+              print(e);
+            }
+          } else {
+            //todo 不存在
+          }
+
+          break;
+        }
       case CopyDirection.target2recycle:
         // todo 与 target2Leaf完全一致,传入参数改为只传leafIdname？
         {
@@ -180,6 +212,7 @@ class Repo {
     }
   }
 
+//TODO 直接接受String leafIdName
   String genLeafPath(ValueKey<String> key, LeafFrom leafType) {
     final String leafBelongPath;
     switch (leafType) {
@@ -222,10 +255,12 @@ class Repo {
         }
       case LeafFrom.autoSave:
         {
+          //repo 并不存储自动保存，已经分离出去
           final targetLeaf = getLeafByKey(targetLeafKey, LeafFrom.autoSave);
           leafs.add(targetLeaf);
-          autoSaves.remove(targetLeaf);
+          // autoSaves.remove(targetLeaf);
           _headerRelation(targetLeafKey, false);
+          _copyTo(targetLeafKey.value, CopyDirection.autoSave2Leafs);
           break;
         }
     }
@@ -310,6 +345,7 @@ class Repo {
       } else {
         if (headerLeafKey == targetLeafKey) {
           //设置标头为子节点中最晚创建的
+          //不设置为全局最晚创建的leaf？寻找最接近相对被删节点状态的版本。
           int youngestChild = 0;
           ValueKey<String> maxLeafKey = const ValueKey("");
           for (var childLeafKey in downStream.value) {
@@ -418,13 +454,13 @@ class Repo {
       "roots": rootLeafKeys.map((e) => e.value).toList(),
       "leafs": Map.fromEntries(leafs.map((e) => e.toMapEntry())),
       "leafRcyclBin": Map.fromEntries(leafRcyclBin.map((e) => e.toMapEntry())),
-      "autoSaves": Map.fromEntries(autoSaves.map((e) => e.toMapEntry())),
+      /* "autoSaves": Map.fromEntries(autoSaves.map((e) => e.toMapEntry())),*/
       "relations": realtions.map((source, destinations) =>
           MapEntry(source.value, destinations.map((e) => e.value).toList()))
     };
 
+    //TODO 存储json对象
     File jsonFile = File("$repoPath${Platform.pathSeparator}$repoIdName.json");
-    //todo 异步
     jsonFile.writeAsStringSync(json.encode(repoMap));
   }
 
@@ -482,6 +518,10 @@ class Repo {
 
     Directory leafsPath = Directory("$repoPath${Platform.pathSeparator}leafs");
 
+    final jsonFile =
+        await File("${repoPath}${Platform.pathSeparator}autoSaves.json");
+    jsonFile.create();
+    jsonFile.writeAsStringSync(json.encode([]));
     await autoSavePath.create(recursive: true);
     await leafsPath.create(recursive: true);
 
@@ -501,7 +541,7 @@ class Repo {
         newComparsionTab,
         autoSaveIntervalMinutes,
         autoSaveNums,
-        null, [], [], [], [], {});
+        null, [], [], [], /*[],*/ {});
   }
 
   static Future<Repo> fromJson(String jsonFilePath) async {
@@ -529,12 +569,13 @@ class Repo {
     });
 
 //parse autoSaves
-    tempMap = repoJsonObj["leafRcyclBin"];
+//bug but now autoSaves json separated form main
+    // tempMap = repoJsonObj["autoSaves"];
 
-    List<Leaf> autoSaves = [];
-    tempMap.forEach((leafIdName, annotation) {
-      autoSaves.add(Leaf(ValueKey(leafIdName), annotation));
-    });
+    // List<Leaf> autoSaves = [];
+    // tempMap.forEach((leafIdName, annotation) {
+    //   autoSaves.add(Leaf(ValueKey(leafIdName), annotation));
+    // });
 
     String? headerLeafIdName = repoJsonObj["headerLeaf"];
 
@@ -569,7 +610,7 @@ class Repo {
         rootsKeys,
         leafList,
         leafRcyclBin,
-        autoSaves,
+        /*autoSaves,*/
         realtionKeys);
   }
 
@@ -585,13 +626,14 @@ class Repo {
       this.rootLeafKeys,
       this.leafs,
       this.leafRcyclBin,
-      this.autoSaves,
+      /* this.autoSaves,*/
       this.realtions) {
     repoKey = ValueKey(repoName);
   }
 }
 
 class Leaf {
+  //TODO leaf文件夹路径?
   //通过leaf名字字符串生成
   //leaf名称 前缀为创建时间的utc Linux时间戳
 
@@ -610,11 +652,12 @@ class Leaf {
 
   Leaf(this.leafKey, this.annotation) {
     if (leafKey.value.isEmpty) {
-      //当创建graph基底节点，传入 [Leaf(const ValueKey(""), "")]
+      //当创建graph基底节点(节点只保存leafkey 的value，会搜索失败，此时返回空Leaf用于装填并显示） ，传入 [Leaf(const ValueKey(""), "")]
       createdTime = DateTime.now();
       return;
     } else {
       createdTime = DateTime.fromMillisecondsSinceEpoch(
+          //TODO 格式宏定义
           int.parse(leafKey.value.substring(0, leafKey.value.length - 2)));
     }
   }

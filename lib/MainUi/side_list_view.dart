@@ -1,12 +1,27 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/models.dart';
 
-class SideListView extends StatelessWidget {
+List<Leaf> loadJsonLeafs(String jsonFilePath) {
+  final List<String> autoLeafKeys =
+      List<String>.from(json.decode(File(jsonFilePath).readAsStringSync()));
+  return autoLeafKeys.map((e) => Leaf(ValueKey(e), "自动保存")).toList();
+}
+
+//TODO turn to stles
+class SideListView extends StatefulWidget {
   const SideListView({Key? key}) : super(key: key);
 
+  @override
+  State<SideListView> createState() => _SideListViewState();
+}
+
+class _SideListViewState extends State<SideListView> {
   @override
   Widget build(BuildContext context) {
     return Consumer<MainStatus>(builder: (context, provider, child) {
@@ -17,6 +32,12 @@ class SideListView extends StatelessWidget {
             (e) => targetRepo.getLeafByKey(e, LeafFrom.leafs),
           )
           .toList();
+      // 无法准确监听create event ，监听autoSaves.json
+      final jsonFilePath =
+          "${targetRepo.repoPath}${Platform.pathSeparator}autoSaves.json";
+
+      List<Leaf> autoLeafs = loadJsonLeafs(jsonFilePath);
+
       return DefaultTabController(
         length: isAutoSave ? 3 : 2,
         child: Scaffold(
@@ -57,11 +78,47 @@ class SideListView extends StatelessWidget {
               }),
               //显示自动保存
               if (isAutoSave)
-                _buildListView(SideList.recycleBin, targetRepo.autoSaves,
-                    (index) {
-                  targetRepo.retirveToLeaf(
-                      targetRepo.autoSaves[index].leafKey, LeafFrom.autoSave);
-                }),
+                StreamBuilder(
+                    stream: Directory(
+                            "${targetRepo.repoPath}${Platform.pathSeparator}autoSaves")
+                        .watch(),
+                    //useless const to set init data
+                    initialData: 0,
+                    builder: (context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasError) {
+                        //TODO 统一error widget
+                        return const Center(child: Icon(Icons.error));
+                      } else {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          case ConnectionState.waiting:
+                            {
+                              break;
+                            }
+                          case ConnectionState.active:
+                            {
+                              //TODO 重复event导致更新
+                              autoLeafs = loadJsonLeafs(jsonFilePath);
+                              break;
+                            }
+
+                          case ConnectionState.done:
+                            {
+                              break;
+                            }
+                        }
+                        return _buildListView(SideList.autoSave, autoLeafs,
+                            (leafIndex) {
+                          //非移动，而且“复制”一个完全一致的leaf
+                          targetRepo.retirveToLeaf(
+                              autoLeafs[leafIndex].leafKey, LeafFrom.autoSave);
+                          provider
+                              .focusToNode(autoLeafs[leafIndex].leafKey.value);
+                        });
+                      }
+                    })
             ],
           ),
         ),
@@ -69,6 +126,8 @@ class SideListView extends StatelessWidget {
     });
   }
 }
+
+// class SideListView extends StatelessWidget {}
 
 //todo impl ontap
 Widget _buildListView(SideList tapFrom, List<Leaf> theList,
@@ -125,8 +184,9 @@ Widget _buildListView(SideList tapFrom, List<Leaf> theList,
           }
         },
         child: ListTile(
-          title: _buildBrefTile(theList[index].createdTime.toLocal().toString(),
-              theList[index].annotation),
+          // title: _buildBrefTile(theList[index].createdTime.toLocal().toString(),
+          title: _buildBrefTile(
+              theList[index].leafKey.value, theList[index].annotation),
         ),
       );
     },

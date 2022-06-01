@@ -6,6 +6,7 @@ import 'package:visual_branching/Repository/NewRepo/repo_config_model.dart';
 import 'package:visual_branching/Repository/NewRepo/repo_options.dart';
 import 'package:visual_branching/Repository/repos_list.dart';
 import 'package:visual_branching/providers/main_status.dart';
+import 'package:visual_branching/util/funcs.dart';
 import 'package:visual_branching/util/models.dart';
 
 void repoManagDialog(BuildContext context) {
@@ -79,12 +80,18 @@ void repoManagDialog(BuildContext context) {
                                         onPressed: () {
                                           //todo impl
                                           //todo 关闭已打开 ()
-                                          Provider.of<MainStatus>(context,
-                                                  listen: false)
-                                              .removeAllOpenedRepo();
+                                          confirmDialog(context, "确认删除库？",
+                                                  "不会移动到系统回收站，删除后无法恢复。")
+                                              .then((result) {
+                                            if (result == true) {
+                                              Provider.of<MainStatus>(context,
+                                                      listen: false)
+                                                  .removeAllOpenedRepo();
 
-                                          Repo.delRepo(repo);
-                                          Navigator.of(context).pop();
+                                              Repo.delRepo(repo);
+                                              Navigator.of(context).pop();
+                                            }
+                                          });
                                         },
                                         child: const Text("删除库"),
                                       ),

@@ -61,10 +61,10 @@ class _NodeWidgetState extends State<NodeWidget> {
                       orElse: () => Leaf(const ValueKey(""), ""))
                   .createdTime
                   .toString()),
-              //当创建repo 名字的node时，会转入orElse
+              //当创建repo 名字的node时，会转入orElse ,显示repo名称
               Text(provider.openedRepoList.first.leafs
                   .firstWhere((element) => element.leafKey == widget.leafkey,
-                      orElse: () => Leaf(const ValueKey(""), ""))
+                      orElse: () => Leaf(const ValueKey(""), widget.leafkey.value))
                   .annotation)
             ]),
           ),
