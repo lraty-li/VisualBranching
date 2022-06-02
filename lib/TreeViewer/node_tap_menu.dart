@@ -7,13 +7,19 @@ import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/funcs.dart';
 
 void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
-  if (!Provider.of<MainStatus>(context, listen: false)
-      .openedRepoList
-      .first
-      .leafs
-      .any(
-        (element) => element.leafKey == nodeKey,
-      )) {
+  final targetRepo =
+      Provider.of<MainStatus>(context, listen: false).openedRepoList.first;
+  final provider = Provider.of<MainStatus>(context, listen: false);
+  //the repoIdName node, not in repo.leafs
+  var isBase = true;
+  String nodeAnno = "";
+  for (var leaf in targetRepo.leafs) {
+    if (leaf.leafKey == nodeKey) {
+      isBase = false;
+      nodeAnno = leaf.annotation;
+    }
+  }
+  if (isBase) {
     //点击了头节点，不显示菜单
     return;
   }
@@ -21,15 +27,12 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
       context: context,
       builder: (context) {
         return SimpleDialog(
-          title: Text(nodeKey.value),
+          title: Text(nodeAnno),
           children: [
             SimpleDialogOption(
               onPressed: (() {
-                Provider.of<MainStatus>(context, listen: false)
-                    .openedRepoList
-                    .first
-                    .retirveToLeaf(nodeKey, LeafFrom.leafs);
-                Provider.of<MainStatus>(context, listen: false)
+                targetRepo.retirveToLeaf(nodeKey, LeafFrom.leafs);
+                provider
 
                     //todo 已有nodeKey
                     .focusToNode(nodeKey.value);
@@ -43,12 +46,10 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
             SimpleDialogOption(
               onPressed: (() {
                 // 复制节点信息
-                final provider =
-                    Provider.of<MainStatus>(context, listen: false);
-                final repo = provider.openedRepoList.first;
-                final targetLeaf = repo.leafs
+
+                final targetLeaf = targetRepo.leafs
                     .firstWhere((element) => element.leafKey == nodeKey);
-                repo
+                targetRepo
                     .newLeaf(NodeType.manually, targetLeaf.annotation, true)
                     .then((newLeaf) {
                   provider.focusToNode(newLeaf.leafKey.value);
@@ -61,10 +62,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
             SimpleDialogOption(
               onPressed: (() async {
                 final path = Uri.file(
-                    Provider.of<MainStatus>(context, listen: false)
-                        .openedRepoList
-                        .first
-                        .genLeafPath(nodeKey, LeafFrom.leafs),
+                    targetRepo.genLeafPath(nodeKey, LeafFrom.leafs),
                     windows: true);
                 //todo 出错控制
                 if (!await launchUrl(path)) throw 'Could not launch $path';
@@ -73,14 +71,11 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
             ),
             SimpleDialogOption(
               onPressed: (() async {
-                final provider =
-                    Provider.of<MainStatus>(context, listen: false);
                 final navigator = Navigator.of(context);
                 String? newAnnotation =
                     await strDialog(context, "修改备注", "输入新备注");
-                provider.openedRepoList.first
-                    .alterLeafAnno(nodeKey, newAnnotation ?? "");
-
+                targetRepo.alterLeafAnno(nodeKey, newAnnotation ?? "");
+                provider.focusedNode.first = nodeKey.value;
                 provider.updateVoidCall();
 
                 navigator.pop();
@@ -89,14 +84,12 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
             ),
             SimpleDialogOption(
               onPressed: (() {
-                final provider =
-                    Provider.of<MainStatus>(context, listen: false);
-                final repo = provider.openedRepoList.first;
-                final parentLeaf = repo.getParentLeaf(nodeKey);
-                repo.delLeaf(nodeKey);
+                final parentLeaf = targetRepo.getParentLeaf(nodeKey);
+                targetRepo.delLeaf(nodeKey);
                 //聚焦到被删节点父节点而不是标头，避免当删除远处节点时聚焦到标头
-                provider.focusToNode(
-                    parentLeaf == null ? repo.repoName : parentLeaf.value);
+                provider.focusToNode(parentLeaf == null
+                    ? targetRepo.repoName
+                    : parentLeaf.value);
                 Navigator.of(context).pop();
               }),
               child: const Text("删除该节点"),

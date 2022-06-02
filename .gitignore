@@ -54,3 +54,6 @@ ios
 linux
 macos
 web
+
+# compiled headless autosave
+/autoSave-cli/visual_branching_autosave_nogui.exe

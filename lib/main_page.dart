@@ -7,7 +7,6 @@ import 'MainUi/ctl_btn.dart';
 import 'MainUi/window_title_bar.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 
-const borderColor = Color(0xFF805306);
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
