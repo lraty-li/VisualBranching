@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:visual_branching/util/models.dart';
+import 'package:window_manager/window_manager.dart';
 
 class MainStatus extends ChangeNotifier {
   //opened repo, but only one repo supported now , maybe muti repo will be support
   List<Repo> openedRepoList = [];
   List<Graph> graphs = [];
   List<String> focusedNode = [];
+  bool alwaysOnTop = false;
 
   updateVoidCall() {
     //TODO 单个repo调用时导致全部更新（虽然目前不支持打开多个repo）
@@ -43,5 +45,10 @@ class MainStatus extends ChangeNotifier {
   focusToNode(String key) {
     focusedNode.first = key;
     notifyListeners();
+  }
+
+  setAlwaysOnTop(bool value) {
+    alwaysOnTop = value;
+    windowManager.setAlwaysOnTop(value);
   }
 }

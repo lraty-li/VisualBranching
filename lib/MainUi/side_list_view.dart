@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,20 +7,15 @@ import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/models.dart';
 
 List<Leaf> loadJsonLeafs(String jsonFilePath) {
+  //load the autoSaves.json
   final List<String> autoLeafKeys =
       List<String>.from(json.decode(File(jsonFilePath).readAsStringSync()));
   return autoLeafKeys.map((e) => Leaf(ValueKey(e), "自动保存")).toList();
 }
 
-//TODO turn to stles
-class SideListView extends StatefulWidget {
+class SideListView extends StatelessWidget {
   const SideListView({Key? key}) : super(key: key);
 
-  @override
-  State<SideListView> createState() => _SideListViewState();
-}
-
-class _SideListViewState extends State<SideListView> {
   @override
   Widget build(BuildContext context) {
     return Consumer<MainStatus>(builder: (context, provider, child) {
@@ -127,9 +121,7 @@ class _SideListViewState extends State<SideListView> {
   }
 }
 
-// class SideListView extends StatelessWidget {}
 
-//todo impl ontap
 Widget _buildListView(SideList tapFrom, List<Leaf> theList,
     void Function(int leafIndex) onTapfunc) {
   Offset tapPosition;

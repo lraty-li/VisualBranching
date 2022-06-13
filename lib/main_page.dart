@@ -1,24 +1,44 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:visual_branching/MainUi/side_list_view.dart';
 import 'package:visual_branching/TreeViewer/view.dart';
 import 'package:visual_branching/providers/main_status.dart';
+import 'package:window_manager/window_manager.dart';
 import 'MainUi/ctl_btn.dart';
 import 'MainUi/window_title_bar.dart';
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 
-
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: HomePage(),
-      ),
-    );
+    final virtualWindowFrameBuilder = VirtualWindowFrameInit();
+    final botToastBuilder = BotToastInit();
+
+    return MultiProvider(
+        providers: [
+          ListenableProvider<MainStatus>(create: (context) => MainStatus())
+        ],
+        child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            builder: (context, child) {
+              child = virtualWindowFrameBuilder(context, child);
+              child = botToastBuilder(context, child);
+              return child;
+            },
+            navigatorObservers: [BotToastNavigatorObserver()],
+            home: const HomePage()));
   }
 }
 
@@ -27,37 +47,43 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        WindowTitleBar(
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: WindowTitleBar(
           pContext: context,
         ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height - appWindow.titleBarHeight,
-          width: MediaQuery.of(context).size.width,
-          child: Consumer<MainStatus>(
-            builder: (context, provider, child) =>
-                provider.openedRepoList.isEmpty
-                    //未开启任何repo时
-                    ? _fakeTreeWindow()
-                    : Flex(
-                        direction: Axis.horizontal,
-                        children: [
-                          const Expanded(flex: 5, child: TreeView()),
-                          Expanded(
-                              flex: 1,
-                              child: Flex(
-                                direction: Axis.vertical,
-                                children: const [
-                                  Expanded(child: SideListView()),
-                                  CtlBtn()
-                                ],
-                              ))
-                        ],
-                      ),
-          ),
-        )
-      ],
+      ),
+      body: Column(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height -
+                kToolbarHeight /* - windowManager.getTitleBarHeight()*/,
+            width: MediaQuery.of(context).size.width,
+            child: Consumer<MainStatus>(
+              builder: (context, provider, child) =>
+                  provider.openedRepoList.isEmpty
+                      //未开启任何repo时
+                      ? _fakeTreeWindow()
+                      : Flex(
+                          direction: Axis.horizontal,
+                          children: [
+                            const Expanded(flex: 5, child: TreeView()),
+                            Expanded(
+                                flex: 1,
+                                child: Flex(
+                                  direction: Axis.vertical,
+                                  children: const [
+                                    Expanded(child: SideListView()),
+                                    CtlBtn()
+                                  ],
+                                ))
+                          ],
+                        ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

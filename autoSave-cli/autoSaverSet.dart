@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -96,7 +98,7 @@ class AutoSaveInstance {
           //TODO 文件夹操作会触发UI端更新
           //TODO 确定最老备份？
           //清理自动保存,删除第一个(autoSaveIdNames最小为0)
-          final String oldestIdName = "${autoSaveIdNames[0]}";
+          final String oldestIdName = autoSaveIdNames[0];
           autoSaveIdNames.removeAt(0);
           try {
             Directory(
@@ -141,7 +143,7 @@ class AutoSaveInstance {
           //库被删除
           showError(e.toString());
           //TODO 保留错误信息
-          showError("出错了！,取消 ${repoName} 的自动保存");
+          showError("出错了！,取消 $repoName 的自动保存");
           timer.cancel();
         }
       }
