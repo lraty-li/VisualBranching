@@ -1,4 +1,4 @@
-import 'package:bitsdojo_window/bitsdojo_window.dart';
+// import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/widgets.dart';
 
 class ShowDesktopIntent extends Intent {
@@ -9,7 +9,7 @@ class HideAction extends Action<ShowDesktopIntent> {
   HideAction();
   @override
   Object? invoke(covariant ShowDesktopIntent intent) {
-    appWindow.minimize();
+    // appWindow.minimize();
     return null;
   }
 }

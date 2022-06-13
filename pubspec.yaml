@@ -30,7 +30,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  bitsdojo_window: ^0.1.1+1
+  # bitsdojo_window: ^0.1.1+1
+  bot_toast: ^4.0.0 #null safety
+  window_manager: ^0.2.5
   provider: ^6.0.2
   file_picker: ^4.5.1
   cupertino_icons: ^1.0.2
