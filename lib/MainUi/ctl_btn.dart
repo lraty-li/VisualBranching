@@ -5,6 +5,7 @@ import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/funcs.dart';
 import 'package:visual_branching/util/models.dart';
+import 'package:visual_branching/util/strings.dart';
 
 class CtlBtn extends StatelessWidget {
   const CtlBtn({Key? key}) : super(key: key);
@@ -13,13 +14,13 @@ class CtlBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       _StyledBtn(
-        text: "备份到标头",
+        text: StringsCollection.backupToHeader,
         colorData: Colors.blue,
         onTapFunc: (provider) async {
           final tempOldheaderId =
               "${provider.openedRepoList.first.headerLeafKey?.value}";
-          Future<Leaf> newleafFuture = provider.openedRepoList.first
-              .newLeaf(NodeType.manually, "新建节点", false);
+          Future<Leaf> newleafFuture = provider.openedRepoList.first.newLeaf(
+              NodeType.manually, StringsCollection.newCreatedLeaf, false);
           newleafFuture.then((newLeaf) {
             //加入graph，
 
@@ -41,7 +42,7 @@ class CtlBtn extends StatelessWidget {
         },
       ),
       _StyledBtn(
-          text: "回退到标头",
+          text: StringsCollection.retriveToHeader,
           colorData: Colors.blue,
           onTapFunc: (provider) {
             final tempOldheaderId =
@@ -56,11 +57,11 @@ class CtlBtn extends StatelessWidget {
             }
           }),
       _StyledBtn(
-          text: "清空回收站",
+          text: StringsCollection.cleanRecycleBin,
           colorData: Colors.red,
           onTapFunc: (provider) {
-            final result =
-                confirmDialog(context, "确认清空回收站？", "不会移动到系统回收站，清空后无法恢复。");
+            final result = confirmDialog(context,
+                StringsCollection.clnRcyleBinConfirm, StringsCollection.clnRcyleBinAlert);
             result.then((value) {
               if (value == true) {
                 provider.openedRepoList.first.clearRecycleBin();

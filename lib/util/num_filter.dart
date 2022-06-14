@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:visual_branching/util/class_wraper.dart';
+import 'package:visual_branching/util/strings.dart';
 
 class NumericalRangeFormatter extends TextInputFormatter {
   //自定义过滤器
@@ -7,7 +8,7 @@ class NumericalRangeFormatter extends TextInputFormatter {
   final int max;
   ClassWraper errTxtWarp;
   String errTxtTemplate;
-  NumericalRangeFormatter({required this.max, required this.errTxtWarp,this.errTxtTemplate="最大值为"});
+  NumericalRangeFormatter({required this.max, required this.errTxtWarp,this.errTxtTemplate=StringsCollection.maxValueAlarm});
 
   @override
   TextEditingValue formatEditUpdate(

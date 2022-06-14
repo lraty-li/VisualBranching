@@ -3,11 +3,12 @@ import 'package:visual_branching/Repository/NewRepo/new_repo.dart';
 import 'package:visual_branching/Repository/oepn_repo.dart';
 import 'package:visual_branching/Repository/repo_manage.dart';
 import 'package:visual_branching/util/common.dart';
+import 'package:visual_branching/util/strings.dart';
 
 Widget repoMenuBuilder(BuildContext context) {
   //TODO 自行showmenu
   return PopupMenuButton<RepoManagOpt>(
-    icon: const Text("库"),
+    icon: const Text(StringsCollection.repository),
     //todo ? kToolbarHeight
     offset: const Offset(0, kToolbarHeight / 2),
     onSelected: (RepoManagOpt result) {
@@ -16,15 +17,15 @@ Widget repoMenuBuilder(BuildContext context) {
     itemBuilder: (BuildContext context) => <PopupMenuEntry<RepoManagOpt>>[
       const PopupMenuItem<RepoManagOpt>(
         value: RepoManagOpt.openRepo,
-        child: Text('打开'),
+        child: Text(StringsCollection.open),
       ),
       const PopupMenuItem<RepoManagOpt>(
         value: RepoManagOpt.newRepo,
-        child: Text('新建'),
+        child: Text(StringsCollection.create),
       ),
       const PopupMenuItem<RepoManagOpt>(
         value: RepoManagOpt.managRepos,
-        child: Text('管理'),
+        child: Text(StringsCollection.management),
       ),
     ],
   );

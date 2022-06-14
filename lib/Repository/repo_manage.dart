@@ -8,6 +8,7 @@ import 'package:visual_branching/Repository/repos_list.dart';
 import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/funcs.dart';
 import 'package:visual_branching/util/models.dart';
+import 'package:visual_branching/util/strings.dart';
 
 void repoManagDialog(BuildContext context) {
   showDialog<String?>(
@@ -15,7 +16,7 @@ void repoManagDialog(BuildContext context) {
       builder: (context) {
         return AlertDialog(
           //TODO 删除后,自动保存对应实例出错
-          title: const Text("库管理"),
+          title: const Text(StringsCollection.repoManagement),
           content: SizedBox(
             width: MediaQuery.of(context).size.width * 0.5,
             height: MediaQuery.of(context).size.height * 0.6,
@@ -63,7 +64,7 @@ void repoManagDialog(BuildContext context) {
                                                     Navigator.of(context).pop();
                                                   }
                                                 : null,
-                                            child: const Text("确认修改"),
+                                            child: const Text(StringsCollection.applyAlter),
                                           );
                                         },
                                       ),
@@ -71,7 +72,7 @@ void repoManagDialog(BuildContext context) {
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
-                                        child: const Text("取消"),
+                                        child: const Text(StringsCollection.cancel),
                                       ),
                                       ElevatedButton(
                                         style: ButtonStyle(
@@ -81,8 +82,8 @@ void repoManagDialog(BuildContext context) {
                                         onPressed: () {
                                           //todo impl
                                           //todo 关闭已打开 ()
-                                          confirmDialog(context, "确认删除库？",
-                                                  "不会移动到系统回收站，删除后无法恢复。请刷新自动保存")
+                                          confirmDialog(context, StringsCollection.delRepoWarningQuery,
+                                                  StringsCollection.delRepoWarningDeatil)
                                               .then((result) {
                                             if (result == true) {
                                               Provider.of<MainStatus>(context,
@@ -94,7 +95,7 @@ void repoManagDialog(BuildContext context) {
                                             }
                                           });
                                         },
-                                        child: const Text("删除库"),
+                                        child: const Text(StringsCollection.delRepo),
                                       ),
                                     ],
                                     content: SizedBox(
@@ -120,7 +121,7 @@ void repoManagDialog(BuildContext context) {
                                                 child: Flex(
                                                   direction: Axis.vertical,
                                                   children: [
-                                                    const Text("已选择文件（不可修改)"),
+                                                    const Text(StringsCollection.chosenFilesUnChangeAble),
 
                                                     Expanded(
                                                         child: ListView.builder(

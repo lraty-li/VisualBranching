@@ -5,12 +5,13 @@ import 'package:provider/provider.dart';
 import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/models.dart';
+import 'package:visual_branching/util/strings.dart';
 
 List<Leaf> loadJsonLeafs(String jsonFilePath) {
   //load the autoSaves.json
   final List<String> autoLeafKeys =
       List<String>.from(json.decode(File(jsonFilePath).readAsStringSync()));
-  return autoLeafKeys.map((e) => Leaf(ValueKey(e), "自动保存")).toList();
+  return autoLeafKeys.map((e) => Leaf(ValueKey(e), StringsCollection.autoSave)).toList();
 }
 
 class SideListView extends StatelessWidget {
@@ -43,9 +44,9 @@ class SideListView extends StatelessWidget {
               bottom: TabBar(
                 isScrollable: true,
                 tabs: [
-                  const Tab(text: '分支'),
-                  const Tab(text: '回收站'),
-                  if (isAutoSave) const Tab(text: '自动保存'),
+                  const Tab(text: StringsCollection.branch),
+                  const Tab(text: StringsCollection.recycleBin),
+                  if (isAutoSave) const Tab(text: StringsCollection.autoSave),
                 ],
               ),
             ),
@@ -152,7 +153,7 @@ Widget _buildListView(SideList tapFrom, List<Leaf> theList,
                         items: <PopupMenuEntry<int>>[
                           PopupMenuItem(
                             value: index,
-                            child: const Text("回退到节点"),
+                            child: const Text(StringsCollection.retriveToLeaf),
                           )
                         ],
 

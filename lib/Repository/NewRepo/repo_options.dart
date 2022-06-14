@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:visual_branching/Repository/NewRepo/repo_config_model.dart';
 import 'package:visual_branching/util/class_wraper.dart';
 import 'package:visual_branching/util/num_filter.dart';
+import 'package:visual_branching/util/strings.dart';
 
 class RepoOptions extends StatefulWidget {
   final RepoConfig configHandle;
@@ -31,15 +32,14 @@ class RRepoOptionsState extends State<RepoOptions> {
             onChanged: ((value) => widget.configHandle.setRepoName(value)),
             decoration: InputDecoration(
                 hintText: widget.configHandle.repoName.isEmpty
-                    ? "库名称"
+                    ? StringsCollection.reposName
                     : widget.configHandle.repoName,
-                labelText: "库名称",
+                labelText: StringsCollection.reposName,
                 errorText: _nameErrorText.value)),
-        const Text("自动保存不在此软件运行"),
-        const Text("修改配置后请手动刷新自动保存"),
+        const Text(StringsCollection.autoSaveIntroduce),
         Row(
           children: [
-            const Text("开启自动保存"),
+            const Text(StringsCollection.enAbleAutoSave),
 
             // Builder(
             //   builder: (BuildContext context) {
@@ -67,7 +67,7 @@ class RRepoOptionsState extends State<RepoOptions> {
             }
           },
           decoration: InputDecoration(
-            labelText: "自动保存时间间隔(分钟)",
+            labelText: StringsCollection.autoSaveIntervalMins,
             errorText: _intervalErrTxt.value,
             //todo 可配置化（“60” 改为宏定义）
             hintText: widget.configHandle.autoSaveInterval < 0
@@ -87,7 +87,7 @@ class RRepoOptionsState extends State<RepoOptions> {
             }
           },
           decoration: InputDecoration(
-              labelText: "自动保存个数上限",
+              labelText: StringsCollection.autoSaveNums,
               errorText: _saveNumErrTxt.value,
               hintText: widget.configHandle.autoSavesNums < 0
                   ? "-1"

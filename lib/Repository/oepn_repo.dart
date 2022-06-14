@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:visual_branching/Repository/repos_list.dart';
 import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/models.dart';
+import 'package:visual_branching/util/strings.dart';
 
 void openRepoDialog(BuildContext context) {
   showDialog<String?>(
@@ -10,7 +11,7 @@ void openRepoDialog(BuildContext context) {
       builder: (context) {
         return Consumer<MainStatus>(
           builder: (context, provider, child) => AlertDialog(
-            title: const Text("打开库"),
+            title: const Text(StringsCollection.openRepo),
             content: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.5,
                 height: MediaQuery.of(context).size.height * 0.6,

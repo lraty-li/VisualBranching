@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:visual_branching/Repository/repository_menu.dart';
 import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/funcs.dart';
+import 'package:visual_branching/util/strings.dart';
 import 'package:window_manager/window_manager.dart';
 
 class WindowTitleBar extends StatelessWidget {
@@ -18,16 +19,16 @@ class WindowTitleBar extends StatelessWidget {
         repoMenuBuilder(pContext),
         ElevatedButton(
             onPressed: () => {
-                  confirmDialog(context, "设置",
-                          "这是未完成版本,你可以点击确认前往github页面寻找更新\nhttps://github.com/lraty-li/VisualBranching")
+                  confirmDialog(context, StringsCollection.setting,
+                          StringsCollection.settingInfo)
                       .then((confirmed) {
                     if (confirmed == true) {
                       launchUrl(Uri.parse(
-                          "https://github.com/lraty-li/VisualBranching"));
+                          StringsCollection.projGithubUrl));
                     }
                   })
                 },
-            child: const Text("软件设置")),
+            child: const Text(StringsCollection.setting)),
         Expanded(
           child: DragToMoveArea(
             child: Container(

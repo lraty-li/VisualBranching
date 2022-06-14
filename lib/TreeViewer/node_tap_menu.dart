@@ -5,6 +5,7 @@ import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/common.dart';
 
 import 'package:visual_branching/util/funcs.dart';
+import 'package:visual_branching/util/strings.dart';
 
 void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
   final targetRepo =
@@ -39,7 +40,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
 
                 Navigator.of(context).pop();
               }),
-              child: const Text("回档到该节点"),
+              child: const Text(StringsCollection.retriveToLeaf),
             ),
             // SimpleDialogOption(
             //     child: Text("设为标头"), onPressed: (() => {print("Line35")})),
@@ -57,7 +58,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
 
                 Navigator.of(context).pop();
               }),
-              child: const Text("由节点新建分支"),
+              child: const Text(StringsCollection.newBranchFromLeaf),
             ),
             SimpleDialogOption(
               onPressed: (() async {
@@ -67,20 +68,20 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                 //todo 出错控制
                 if (!await launchUrl(path)) throw 'Could not launch $path';
               }),
-              child: const Text("打开节点文件路径"),
+              child: const Text(StringsCollection.openLeafDir),
             ),
             SimpleDialogOption(
               onPressed: (() async {
                 final navigator = Navigator.of(context);
                 String? newAnnotation =
-                    await strDialog(context, "修改备注", "输入新备注");
+                    await strDialog(context, StringsCollection.alterAnnotation,StringsCollection.inputNewAnnoation);
                 targetRepo.alterLeafAnno(nodeKey, newAnnotation ?? "");
                 provider.focusedNode.first = nodeKey.value;
                 provider.updateVoidCall();
 
                 navigator.pop();
               }),
-              child: const Text("修改备注"),
+              child: const Text(StringsCollection.alterAnnotation),
             ),
             SimpleDialogOption(
               onPressed: (() {
@@ -92,7 +93,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
                     : parentLeaf.value);
                 Navigator.of(context).pop();
               }),
-              child: const Text("删除该节点"),
+              child: const Text(StringsCollection.delLeaf),
             ),
           ],
         );

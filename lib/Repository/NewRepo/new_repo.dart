@@ -6,6 +6,7 @@ import 'package:visual_branching/Repository/NewRepo/repo_options.dart';
 import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/common.dart';
 import 'package:visual_branching/util/models.dart';
+import 'package:visual_branching/util/strings.dart';
 import 'package:window_manager/window_manager.dart';
 
 void newRepoDialog(BuildContext context) {
@@ -26,14 +27,14 @@ void newRepoDialog(BuildContext context) {
               create: (context) => RepoConfig(targetFilePaths: []),
               child: AlertDialog(
                   title: Row(children: [
-                    const Text("新建库"),
+                    const Text(StringsCollection.createRepository),
                     Expanded(
                         child: DragToMoveArea(
                       child: Container(
                         height: 27,
                         color: const Color(0xFFD8D6D6),
                         child: const Center(
-                          child: Text("已自动置顶窗口，此处可拖动窗口"),
+                          child: Text(StringsCollection.autoAlwaysOnTop),
                         ),
                       ),
                     ))
@@ -58,7 +59,7 @@ void newRepoDialog(BuildContext context) {
                                   //创建一个手动备份作为新树根节点，并将会被设置为标头
                                   await theCreatorRepo.newLeaf(
                                       NodeType.manually,
-                                      "这是一个自动创建的手动备份",
+                                      StringsCollection.defaultAnnotation,
                                       false);
 
                                   if (repoConfig.autoSave) {
@@ -70,7 +71,7 @@ void newRepoDialog(BuildContext context) {
                                   Navigator.of(context).pop();
                                 }
                               : null,
-                          child: const Text("确认"),
+                          child: const Text(StringsCollection.confirmed),
                         );
                       },
                     ),
@@ -79,7 +80,7 @@ void newRepoDialog(BuildContext context) {
                         windowManager.setAlwaysOnTop(oldOnTop);
                         Navigator.of(context).pop();
                       },
-                      child: const Text("取消"),
+                      child: const Text(StringsCollection.cancel),
                     ),
                   ],
                   content: SizedBox(

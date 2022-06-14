@@ -7,6 +7,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:visual_branching/util/common.dart';
+import 'package:visual_branching/util/strings.dart';
 
 //https://stackoverflow.com/questions/61919395/how-to-generate-random-string-in-dart
 //maybe no quicker way
@@ -73,7 +74,7 @@ class Repo {
       case LeafFrom.autoSave:
         {
           //TODO 丢失时间信息
-          return Leaf(leafKey, "由自动保存复制");
+          return Leaf(leafKey, StringsCollection.copiedFromAutoSave);
           // return autoSaves.firstWhere((element) => element.leafKey == leafKey);
         }
     }
@@ -98,7 +99,7 @@ class Repo {
                   .copySync(filePath + Platform.pathSeparator + saveFileName);
             } else {
               //todo 目标文件被删除，如何警告？
-              print(" 目标文件被删除");
+              print(StringsCollection.targeFilesDeled);
             }
           });
         }
@@ -211,7 +212,7 @@ class Repo {
                   .copySync(filePath + Platform.pathSeparator + saveFileName);
             } else {
               //todo 目标文件被删除，如何警告？
-              print(" 目标文件被删除");
+              print(StringsCollection.targeFilesDeled);
             }
           });
           break;
@@ -253,7 +254,8 @@ class Repo {
       case LeafFrom.recycleBin:
         {
           final targetLeaf = getLeafByKey(targetLeafKey, LeafFrom.recycleBin);
-          targetLeaf.annotation = "由回收站还原:${targetLeaf.annotation}";
+          targetLeaf.annotation =
+              "${StringsCollection.restoreFormRecycleBin}${targetLeaf.annotation}";
           leafs.add(targetLeaf);
           leafRcyclBin.remove(targetLeaf);
           //建立关系
@@ -279,7 +281,8 @@ class Repo {
     //不能newLeaf方法,不移动标头不创建relation
 
     final backUpLeaf = Leaf(
-        ValueKey("${DateTime.now().millisecondsSinceEpoch}NA"), "发生覆盖时的备份");
+        ValueKey("${DateTime.now().millisecondsSinceEpoch}NA"),
+        StringsCollection.backupWhenTargetOverWrite);
     leafRcyclBin.add(backUpLeaf);
 
     //复制文件直接到回收站

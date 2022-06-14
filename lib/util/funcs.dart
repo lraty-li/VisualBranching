@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:visual_branching/util/strings.dart';
 
 Future<String?> strDialog(BuildContext context, String title, annotation) {
   final myController = TextEditingController();
@@ -16,13 +17,13 @@ Future<String?> strDialog(BuildContext context, String title, annotation) {
               onPressed: () {
                 Navigator.of(context).pop(myController.text);
               },
-              child: const Text("确认"),
+              child: const Text(StringsCollection.confirmed),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text("取消"),
+              child: const Text(StringsCollection.cancel),
             ),
           ],
         );
@@ -53,13 +54,13 @@ Future<bool?> confirmDialog(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: const Text("确认"),
+              child: const Text(StringsCollection.confirmed),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: const Text("取消"),
+              child: const Text(StringsCollection.cancel),
             ),
           ],
         );

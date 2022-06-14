@@ -4,6 +4,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:visual_branching/Repository/NewRepo/repo_config_model.dart';
+import 'package:visual_branching/util/strings.dart';
 
 // List<XFile> chosenFileList = [];
 
@@ -21,7 +22,8 @@ class _FileChosingState extends State<FileChosing> {
   @override
   Widget build(BuildContext context) {
     return Flex(direction: Axis.vertical, children: [
-      Text("已选择${widget.configHandle.targetFilePaths.length}个文件"),
+      Text(StringsCollection.chosenFileCounting(
+          widget.configHandle.targetFilePaths.length)),
       DropTarget(
         onDragEntered: (detail) {
           _ondragging = true;
@@ -80,7 +82,7 @@ class _FileChosingState extends State<FileChosing> {
             child: Stack(
               children: [
                 if (widget.configHandle.targetFilePaths.isEmpty)
-                  const Center(child: Text("也可以直接拖拽到这里"))
+                  const Center(child: Text(StringsCollection.dragFileToHere))
                 else
                   ListView.builder(
                       itemCount: widget.configHandle.targetFilePaths.length,
@@ -139,14 +141,14 @@ class _FileChosingState extends State<FileChosing> {
                   // User canceled the picker
                 }
               },
-              child: const Text("选择...")),
+              child: const Text(StringsCollection.startChoingFile)),
           ElevatedButton(
               onPressed: () => {
                     setState(() {
                       widget.configHandle.clearAllTarget();
                     })
                   },
-              child: const Text("清空选择"))
+              child: const Text(StringsCollection.clearChosenFIles))
         ],
       )
     ]);
