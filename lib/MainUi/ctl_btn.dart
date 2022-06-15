@@ -3,7 +3,7 @@ import 'package:graphview/GraphView.dart';
 import 'package:provider/provider.dart';
 import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/common.dart';
-import 'package:visual_branching/util/funcs.dart';
+import 'package:visual_branching/util/showDialogs.dart';
 import 'package:visual_branching/util/models.dart';
 import 'package:visual_branching/util/strings.dart';
 
@@ -88,8 +88,8 @@ class _StyledBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+    return Container(
+        margin: const EdgeInsets.fromLTRB(0, 10, 0, 10),
         child: ElevatedButton(
             style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(colorData)),

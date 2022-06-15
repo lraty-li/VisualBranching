@@ -34,11 +34,14 @@ dependencies:
   bot_toast: ^4.0.0 #null safety
   window_manager: ^0.2.5
   provider: ^6.0.2
-  file_picker: ^4.5.1
+  file_picker: ^4.6.1
   cupertino_icons: ^1.0.2
   graphview: ^1.1.1
   desktop_drop: ^0.3.3
   url_launcher: ^6.1.2
+  win32: ^2.4.1
+# dependency_overrides:
+#   ffi: ^2.0.0
   
 dev_dependencies:
   flutter_test:

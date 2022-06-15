@@ -1,3 +1,5 @@
+import 'package:visual_branching/util/strings.dart';
+
 enum NodeTapOpt {
   retrieve,
   newBranch,
@@ -5,12 +7,58 @@ enum NodeTapOpt {
   del,
 }
 
+extension NodeTapOptText on NodeTapOpt {
+  String get text {
+    switch (this) {
+      case NodeTapOpt.retrieve:
+        return StringsCollection.retriveToLeaf;
+      case NodeTapOpt.newBranch:
+        return StringsCollection.newBranchFromLeaf;
+      case NodeTapOpt.openFilePath:
+        return StringsCollection.openLeafDir;
+      case NodeTapOpt.del:
+        return StringsCollection.delLeaf;
+      default:
+        //TODO 宏定义该文本
+        return "undefine NodeTapOptText";
+    }
+  }
+}
+
 enum RepoManagOpt {
   openRepo,
   newRepo,
   managRepos,
 }
-//todo extension 存储 字符串
+
+extension RepoManagOptsStr on RepoManagOpt {
+  String get text {
+    switch (this) {
+      case RepoManagOpt.openRepo:
+        return StringsCollection.openRepository;
+      case RepoManagOpt.newRepo:
+        return StringsCollection.createRepository;
+      case RepoManagOpt.managRepos:
+        return StringsCollection.repoManagement;
+      default:
+        return "undefine RepoManagOptsStr";
+    }
+  }
+}
+
+enum ToolOpts { createShellLink }
+
+extension ToolOptsStr on ToolOpts {
+  String get text {
+    switch (this) {
+      case ToolOpts.createShellLink:
+        return StringsCollection.createShellLink;
+
+      default:
+        return "undefine ToolOpts";
+    }
+  }
+}
 
 enum NodeType { manually, automatically }
 
@@ -26,7 +74,7 @@ enum CopyDirection {
   autoSave2Leafs
 }
 
-enum SideList{
+enum SideList {
   headOfBranch,
   recycleBin,
   autoSave,

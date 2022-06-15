@@ -33,33 +33,44 @@ class StringsCollection {
   static const autoSaveIntervalMins = "自动保存时间间隔(分钟)";
   static const autoSaveNums = "自动保存个数上限";
 
-  static const openRepo="打开库";
+  static const openRepository = "打开库";
 
-  static const repoManagement="库管理";
-  static const applyAlter="应用修改";
-  static const delRepoWarningQuery="确认删除库？";
-  static const delRepoWarningDeatil="不会移动到系统回收站，删除后无法恢复。请刷新自动保存";
-  static const delRepo="删除库";
-  static const chosenFilesUnChangeAble="已选择文件（不可修改)";
+  static const repoManagement = "库管理";
+  static const applyAlter = "应用修改";
+  static const delRepoWarningQuery = "确认删除库？";
+  static const delRepoWarningDeatil = "不会移动到系统回收站，删除后无法恢复。请刷新自动保存";
+  static const delRepo = "删除库";
+  static const chosenFilesUnChangeAble = "已选择文件（不可修改)";
 
-  static const newBranchFromLeaf="由节点新建分支";
-  static const openLeafDir="打开节点文件路径";
-  static const alterAnnotation="修改备注";
-  static const inputNewAnnoation="输入新备注";
-  static const delLeaf="删除该节点";
+  static const newBranchFromLeaf = "由节点新建分支";
+  static const openLeafDir = "打开节点文件路径";
+  static const alterAnnotation = "修改备注";
+  static const inputNewAnnoation = "输入新备注";
+  static const delLeaf = "删除该节点";
 
+  static const repository = "库";
+  static const open = "打开";
+  static const create = "新建";
+  static const management = "管理";
 
-  static const repository="库";
-  static const open="打开";
-  static const create="新建";
-  static const management="管理";
+  static const maxValueAlarm = "最大值为:";
 
-  static const maxValueAlarm="最大值为:";
+  static const copiedFromAutoSave = "由自动保存复制";
+  static const restoreFormRecycleBin = "由回收站还原:";
+  static const backupWhenTargetOverWrite = "发生覆盖时的备份";
+  static const targeFilesDeled = "目标文件被删除";
 
-  static const copiedFromAutoSave="由自动保存复制";
-  static const restoreFormRecycleBin="由回收站还原:";
-  static const backupWhenTargetOverWrite="发生覆盖时的备份";
-  static const targeFilesDeled="目标文件被删除";
+  static const tools = "工具";
+  static const createShellLink = "创建快捷方式";
+
+  static const chosingTargetExe = "选择目标exe";
+  static const chosingTargetRepo = "选择跟随启动自动保存的库";
+  static const chosingShellLnkSavingPath = "选择快捷方式保存位置";
+
+  static const nextStep = "下一步";
+  static const prvStep = "上一步";
+
+  static const chosingFile="选择文件";
 
   static String chosenFileCounting(int count) {
     return "已选择$count个文件";

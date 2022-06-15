@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:visual_branching/Repository/repository_menu.dart';
+import 'package:visual_branching/Tools/tool_drop_down.dart';
 import 'package:visual_branching/providers/main_status.dart';
-import 'package:visual_branching/util/funcs.dart';
+import 'package:visual_branching/util/showDialogs.dart';
 import 'package:visual_branching/util/strings.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -17,6 +18,7 @@ class WindowTitleBar extends StatelessWidget {
     return Row(
       children: [
         repoMenuBuilder(pContext),
+        toolsMenuBuilder(pContext),
         ElevatedButton(
             onPressed: () => {
                   confirmDialog(context, StringsCollection.setting,
@@ -31,12 +33,12 @@ class WindowTitleBar extends StatelessWidget {
             child: const Text(StringsCollection.setting)),
         Expanded(
           child: DragToMoveArea(
-            child: Container(
+            child: SizedBox(
               height: double.infinity,
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.only(left: 16),
+                    margin: const EdgeInsets.only(left: 16),
                     // child: DefaultTextStyle(
                     //   style: TextStyle(
                     //     color: widget.brightness == Brightness.light

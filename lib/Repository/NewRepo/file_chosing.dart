@@ -122,6 +122,8 @@ class _FileChosingState extends State<FileChosing> {
 
                 if (result != null) {
                   bool noSame = true;
+                  //TODO path! , if path is null
+                  //TODO why create File obj?
                   List<File> files =
                       result.paths.map((path) => File(path!)).toList();
                   for (var newfile in files) {

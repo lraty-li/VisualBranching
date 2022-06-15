@@ -57,3 +57,6 @@ web
 
 # compiled headless autosave
 /autoSave-cli/visual_branching_autosave_nogui.exe
+
+#vscode config
+.vscode

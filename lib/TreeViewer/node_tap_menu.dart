@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:visual_branching/providers/main_status.dart';
 import 'package:visual_branching/util/common.dart';
 
-import 'package:visual_branching/util/funcs.dart';
+import 'package:visual_branching/util/showDialogs.dart';
 import 'package:visual_branching/util/strings.dart';
 
 void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
@@ -12,6 +12,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
       Provider.of<MainStatus>(context, listen: false).openedRepoList.first;
   final provider = Provider.of<MainStatus>(context, listen: false);
   //the repoIdName node, not in repo.leafs
+  //TODO 优化检测头节点点击
   var isBase = true;
   String nodeAnno = "";
   for (var leaf in targetRepo.leafs) {
@@ -29,6 +30,7 @@ void nodeOnTap(BuildContext context, ValueKey<String> nodeKey) {
       builder: (context) {
         return SimpleDialog(
           title: Text(nodeAnno),
+          //TODO 改为builders.dart ,根据枚举生成选项
           children: [
             SimpleDialogOption(
               onPressed: (() {
